@@ -1,6 +1,5 @@
 package logic;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -18,7 +17,7 @@ public class ClientBLL {
     public Client findClientById(int id) {
         Client client = clientDAO.findById(id);
         if (client == null) {
-            throw new NoSuchElementException("The student with id =" + id + " was not found!");
+            throw new NoSuchElementException("The client with id =" + id + " was not found!");
         }
         return client;
     }
