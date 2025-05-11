@@ -5,6 +5,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +28,7 @@ public class AbstractDAO<T> {
         sb.append("SELECT ");
         sb.append(" * ");
         sb.append(" FROM ");
-        sb.append(type.getSimpleName());
+        sb.append("`" + type.getSimpleName() + "`");
         sb.append(" WHERE " + "id" + " =?");
         return sb.toString();
     }
@@ -37,7 +38,7 @@ public class AbstractDAO<T> {
         sb.append("SELECT ");
         sb.append(" * ");
         sb.append(" FROM ");
-        sb.append(type.getSimpleName());
+        sb.append("`" + type.getSimpleName() + "`");
         return sb.toString();
     }
 
@@ -61,6 +62,11 @@ public class AbstractDAO<T> {
     private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
         ConnectionFactory.close(resultSet);
         ConnectionFactory.close(preparedStatement);
+        ConnectionFactory.close(connection);
+    }
+
+    private void closeStatementAndConnection(PreparedStatement statement, Connection connection) {
+        ConnectionFactory.close(statement);
         ConnectionFactory.close(connection);
     }
 
@@ -139,8 +145,8 @@ public class AbstractDAO<T> {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String raw   = type.getSimpleName().toLowerCase(); // "order"
-        String table = "`" + raw + "`";                     // "`order`"
+        String rawTableName   = type.getSimpleName().toLowerCase(); // "order"
+        String table = "`" + rawTableName + "`";                     // "`order`"
         String query = createInsertQuery(table);
 
         try {
@@ -174,8 +180,78 @@ public class AbstractDAO<T> {
         return null;
     }
 
-    public T update(T t) {
-        // TODO:
-        return t;
+    //delete object
+    public T delete(T t) {
+        Connection connection   = null;
+        PreparedStatement statement  = null;
+        String rawTableName   = type.getSimpleName().toLowerCase();
+        String table = "`" + rawTableName + "`";  // back‐tick in case of reserved words
+
+        try {
+            PropertyDescriptor pd = new PropertyDescriptor("id", type);
+            Object idValueBeforeDelete = pd.getReadMethod().invoke(t);
+            T obj = findById((Integer) idValueBeforeDelete);
+            if (obj == null) {
+                return null;
+            }
+
+            String query   = "DELETE FROM " + table + " WHERE id = ?";
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(query);
+
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor("id", type);
+            Object idValue = propertyDescriptor.getReadMethod().invoke(t);
+            statement.setObject(1, idValue);
+
+            statement.executeUpdate();
+            return obj;
+
+        } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException ex) {
+            LOGGER.log(Level.WARNING, type.getName() + " delete error", ex);
+        } finally {
+            closeStatementAndConnection(statement, connection);
+        }
+        return null;
+    }
+
+    public T updateField(T t, String fieldName, Object newValue) {
+        if (fieldName.equalsIgnoreCase("id")) {
+            throw new IllegalArgumentException("Cannot update the 'id' field");
+        }
+
+        String table = "`" + type.getSimpleName().toLowerCase() + "`";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            PropertyDescriptor pdId = new PropertyDescriptor("id", type);
+            Integer idValue = (Integer) pdId.getReadMethod().invoke(t);
+
+            boolean validField = Arrays.stream(type.getDeclaredFields())
+                    .map(Field::getName)
+                    .anyMatch(f -> f.equals(fieldName));
+            if (!validField) {
+                throw new IllegalArgumentException("Invalid field: " + fieldName);
+            }
+
+            PropertyDescriptor pdField = new PropertyDescriptor(fieldName, type);
+            Method write = pdField.getWriteMethod();
+            write.invoke(t, newValue);
+
+            String query = "UPDATE " + table + " SET `" + fieldName + "` = ? WHERE `id` = ?";
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(query);
+            statement.setObject(1, newValue);
+            statement.setObject(2, idValue);
+            int updated = statement.executeUpdate();
+
+            if (updated > 0) {
+                return findById(idValue);
+            }
+        } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException ex) {
+            LOGGER.log(Level.WARNING, type.getName() + " updateField error", ex);
+        } finally {
+            closeStatementAndConnection(statement, connection);
+        }
+        return null;
     }
 }

@@ -2,19 +2,18 @@ package model;
 
 public class Order {
     private int id;
-    private int clientId;
-    private int productId;
+    private String clientName;
+    private String productName;
     private int quantity;
 
     public Order() {
     }
 
-    public Order(int clientId, int productId, int quantity) {
+    public Order(int quantity, String clientName, String productName) {
         super();
-        this.id = id;
-        this.clientId = clientId;
-        this.productId = productId;
         this.quantity = quantity;
+        this.clientName = clientName;
+        this.productName = productName;
     }
 
     public int getId() {
@@ -25,20 +24,20 @@ public class Order {
         this.id = id;
     }
 
-    public int getClientId() {
-        return clientId;
+    public String getClientName() {
+        return clientName;
     }
 
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
-    public int getProductId() {
-        return productId;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public int getQuantity() {
@@ -51,7 +50,7 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order [id=" + id + ", clientId=" + clientId + ", productId=" + productId + ", quantity=" + quantity
-                + "]";
+        return "Order [id=" + id + ", clientName=" + clientName + ", productName=" + productName + ", quantity="
+                + quantity + "]";
     }
 }

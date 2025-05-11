@@ -18,37 +18,50 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
 
-        // 1. Instanţiem DAO-urile
-        ClientDAO clientDao   = new ClientDAO();
+        ClientDAO clientDao = new ClientDAO();
+
+        // 1) Insert folosind constructor
+        Client c = new Client("Andrei Pop", "Str. Livezilor 5, Cluj", "andrei.pop@example.com");
+        Client insertedClient = clientDao.insert(c);
+        System.out.println("Inserted client: " + insertedClient);
+
+        // 2) Schimbă doar un câmp: address
+        //    (reţinem obiectul cu id populat în insertedClient)
+        Client updatedClient = clientDao.updateField(insertedClient, "address", "Bulevardul Eroilor 10, București");
+        System.out.println("Updated client (address): " + updatedClient);
+        System.out.println();
+
+
+        // ——— PRODUCT —————————————————————————
+
         ProductDAO productDao = new ProductDAO();
-        OrderDAO   orderDao   = new OrderDAO();
 
-        // 2. Creăm şi inserăm un Client
-        Client newClient = new Client("Maria Pop", "Str. Florilor 12", "maria.pop@example.com", 27);
-        clientDao.insert(newClient);
-        System.out.println("Inserted client: " + newClient);
-        // ↳ va avea acum newClient.getId() setat
+        // 1) Insert folosind constructor
+        Product p = new Product("Boxă Bluetooth", 299.99, 25);
+        Product insertedProduct = productDao.insert(p);
+        System.out.println("Inserted product: " + insertedProduct);
 
-        // 3. Creăm şi inserăm un Product
-        Product newProduct = new Product("Căști Wireless", 149.90, 20);
-        productDao.insert(newProduct);
-        System.out.println("Inserted product: " + newProduct);
-        // ↳ newProduct.getId() populat automat
+        // 2) Schimbă doar un câmp: price
+        Product updatedProduct = productDao.updateField(insertedProduct, "price", 249.50);
+        System.out.println("Updated product (price): " + updatedProduct);
+        System.out.println();
 
-        // 4. Creăm şi inserăm un Order care leagă cele două
-        Order newOrder = new Order(newClient.getId(), newClient.getId(), 3);
-        orderDao.insert(newOrder);
-        System.out.println("Inserted order: " + newOrder);
 
-        /* / 5. (Opţional) Listează tot ce ai inserat
-        System.out.println("\nAll clients:");
-        clientDao.findAll().forEach(c -> System.out.println("  " + c));
+        // ——— ORDER ——————————————————————————
 
-        System.out.println("\nAll products:");
-        productDao.findAll().forEach(p -> System.out.println("  " + p));
+        OrderDAO orderDao = new OrderDAO();
 
-        System.out.println("\nAll orders:");
-        orderDao.findAll().forEach(o -> System.out.println("  " + o)); */
+        try {
+            // 1) Insert cu constructor
+            Order o = new Order(3, "Maria Ionescu", "Căști Wireless");
+            Order insertedOrder = orderDao.insert(o);
+            System.out.println("Inserted order: " + insertedOrder);
+
+            // 2) Încearcă să schimbi quantity – nu e permis
+            orderDao.updateField(insertedOrder, "quantity", 5);
+        } catch (UnsupportedOperationException ex) {
+            System.err.println("UpdateField pe Order nereușit: " + ex.getMessage());
+        }
     }
 
 }
