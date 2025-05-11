@@ -30,7 +30,8 @@ public class ClientBLL {
         return client;
     }
 
-    public Client insertClient(Client client) {
+    public Client insertClient(String name, String address, String email) {
+        Client client = new Client(name, address, email);
         Client clientInserted = clientDAO.insert(client);
         if (clientInserted == null) {
             throw new NoSuchElementException("The client was not inserted!");
