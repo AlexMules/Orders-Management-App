@@ -4,6 +4,8 @@ import access.ClientDAO;
 import access.OrderDAO;
 import access.ProductDAO;
 import logic.ClientBLL;
+import logic.OrderBLL;
+import logic.ProductBLL;
 import model.Client;
 import model.Order;
 import model.Product;
@@ -18,50 +20,84 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
 
-        ClientDAO clientDao = new ClientDAO();
+        ClientBLL clientBll   = new ClientBLL();
+        ProductBLL prodBll    = new ProductBLL();
+        OrderBLL orderBll     = new OrderBLL();
 
-        // 1) Insert folosind constructor
-        Client c = new Client("Andrei Pop", "Str. Livezilor 5, Cluj", "andrei.pop@example.com");
-        Client insertedClient = clientDao.insert(c);
-        System.out.println("Inserted client: " + insertedClient);
+        System.out.println("=== CLIENTS ===");
+        // 1) Insert a new Client
+        Client newClient = new Client("Gabriel Pop", "Str. Lalelelor 20, Cluj", "gabriel.pop@example.com");
+        Client insertedClient = clientBll.insertClient(newClient);
+        System.out.println("Inserted:   " + insertedClient);
 
-        // 2) Schimbă doar un câmp: address
-        //    (reţinem obiectul cu id populat în insertedClient)
-        Client updatedClient = clientDao.updateField(insertedClient, "address", "Bulevardul Eroilor 10, București");
-        System.out.println("Updated client (address): " + updatedClient);
+        // 2) Update a single field
+        Client updatedClient = clientBll.updateClientField(
+                insertedClient,      // the object returned from insert
+                "address",           // field to update
+                "Bd. Libertății 7, București"
+        );
+        System.out.println("Updated:    " + updatedClient);
+
+        // 3) Find by ID
+        Client foundClient = clientBll.findClientById(updatedClient.getId());
+        System.out.println("Found by id:" + foundClient);
+
+        // 4) List all
+        List<Client> allClients = clientBll.findAllClients();
+        System.out.println("All clients:");
+        allClients.forEach(System.out::println);
+
+        // 5) Delete
+        Client deletedClient = clientBll.deleteClient(foundClient);
+        System.out.println("Deleted:    " + deletedClient);
         System.out.println();
 
+        System.out.println("=== PRODUCTS ===");
+        // 1) Insert a new Product
+        Product newProd = new Product("Boxă Portabilă", 129.99, 15);
+        Product insertedProd = prodBll.insertProduct(newProd);
+        System.out.println("Inserted:   " + insertedProd);
 
-        // ——— PRODUCT —————————————————————————
+        // 2) Update single field
+        Product updatedProd = prodBll.updateProductField(
+                insertedProd,
+                "price",
+                109.50
+        );
+        System.out.println("Updated:    " + updatedProd);
 
-        ProductDAO productDao = new ProductDAO();
+        // 3) Find by ID
+        Product foundProd = prodBll.findProductById(updatedProd.getId());
+        System.out.println("Found by id:" + foundProd);
 
-        // 1) Insert folosind constructor
-        Product p = new Product("Boxă Bluetooth", 299.99, 25);
-        Product insertedProduct = productDao.insert(p);
-        System.out.println("Inserted product: " + insertedProduct);
+        // 4) List all
+        List<Product> allProds = prodBll.findAllProducts();
+        System.out.println("All products:");
+        allProds.forEach(System.out::println);
 
-        // 2) Schimbă doar un câmp: price
-        Product updatedProduct = productDao.updateField(insertedProduct, "price", 249.50);
-        System.out.println("Updated product (price): " + updatedProduct);
+        // 5) Delete
+        Product deletedProd = prodBll.deleteProduct(foundProd);
+        System.out.println("Deleted:    " + deletedProd);
         System.out.println();
 
+        System.out.println("=== ORDERS ===");
+        // 1) Insert a new Order
+        Order newOrder = new Order(2, "Gabriel Pop", "Boxă Portabilă");
+        Order insertedOrder = orderBll.insertOrder(newOrder);
+        System.out.println("Inserted:   " + insertedOrder);
 
-        // ——— ORDER ——————————————————————————
+        // 2) Find by ID
+        Order foundOrder = orderBll.findOrderById(insertedOrder.getId());
+        System.out.println("Found by id:" + foundOrder);
 
-        OrderDAO orderDao = new OrderDAO();
+        // 3) List all
+        List<Order> allOrders = orderBll.findAllOrders();
+        System.out.println("All orders:");
+        allOrders.forEach(System.out::println);
 
-        try {
-            // 1) Insert cu constructor
-            Order o = new Order(3, "Maria Ionescu", "Căști Wireless");
-            Order insertedOrder = orderDao.insert(o);
-            System.out.println("Inserted order: " + insertedOrder);
-
-            // 2) Încearcă să schimbi quantity – nu e permis
-            orderDao.updateField(insertedOrder, "quantity", 5);
-        } catch (UnsupportedOperationException ex) {
-            System.err.println("UpdateField pe Order nereușit: " + ex.getMessage());
-        }
+        // 4) Delete
+        Order deletedOrder = orderBll.deleteOrder(foundOrder);
+        System.out.println("Deleted:    " + deletedOrder);
     }
-
 }
+
