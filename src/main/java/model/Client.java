@@ -5,7 +5,6 @@ public class Client {
     private String name;
     private String address;
     private String email;
-    private int age;
 
     public Client() {
     }
@@ -16,7 +15,6 @@ public class Client {
         this.name = name;
         this.address = address;
         this.email = email;
-        this.age = age;
     }
 
     public Client(String name, String address, String email, int age) {
@@ -24,7 +22,6 @@ public class Client {
         this.name = name;
         this.address = address;
         this.email = email;
-        this.age = age;
     }
 
     public int getId() {
@@ -51,14 +48,6 @@ public class Client {
         this.address = address;
     }
 
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -69,8 +58,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return "Client [id=" + id + ", name=" + name + ", address=" + address + ", email=" + email + ", age=" + age
-                + "]";
+        return "Client [id=" + id + ", name=" + name + ", address=" + address + ", email=" + email + "]";
     }
 
 }
