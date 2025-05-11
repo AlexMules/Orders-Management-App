@@ -9,14 +9,6 @@ public class Client {
     public Client() {
     }
 
-    public Client(int id, String name, String address, String email, int age) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.email = email;
-    }
-
     public Client(String name, String address, String email, int age) {
         super();
         this.name = name;

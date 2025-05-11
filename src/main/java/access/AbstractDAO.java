@@ -3,10 +3,7 @@ package access;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,20 +20,19 @@ public class AbstractDAO<T> {
     @SuppressWarnings("unchecked")
     public AbstractDAO() {
         this.type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-
     }
 
-    private String createSelectQuery(String field) {
+    private String createFindByIDSelectQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
         sb.append(" * ");
         sb.append(" FROM ");
         sb.append(type.getSimpleName());
-        sb.append(" WHERE " + field + " =?");
+        sb.append(" WHERE " + "id" + " =?");
         return sb.toString();
     }
 
-    private String createSelectFindAllQuery() {
+    private String createFindAllSelectQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
         sb.append(" * ");
@@ -45,11 +41,35 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    private String createInsertQuery(String table) {
+        List<String> cols = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+
+        for (Field f : type.getDeclaredFields()) {
+            String name = f.getName();
+            if ("id".equalsIgnoreCase(name)) continue;
+            cols.add(name);
+            if (!sb.isEmpty()) sb.append(", ");
+            sb.append("?");
+        }
+
+        String colsPart = String.join(", ", cols);
+        return "INSERT INTO " + table +
+                " (" + colsPart + ") VALUES (" + sb + ")";
+    }
+
+    private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
+        ConnectionFactory.close(resultSet);
+        ConnectionFactory.close(preparedStatement);
+        ConnectionFactory.close(connection);
+    }
+
+    //find object
     public List<T> findAll() {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String query = createSelectFindAllQuery();
+        String query = createFindAllSelectQuery();
         try {
             connection = ConnectionFactory.getConnection();
             statement = connection.prepareStatement(query);
@@ -59,18 +79,17 @@ public class AbstractDAO<T> {
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, type.getName() + "DAO:findAll " + e.getMessage());
         } finally {
-            ConnectionFactory.close(resultSet);
-            ConnectionFactory.close(statement);
-            ConnectionFactory.close(connection);
+            closeAll(resultSet, statement, connection);
         }
         return null;
     }
 
+    //find object
     public T findById(int id) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String query = createSelectQuery("id");
+        String query = createFindByIDSelectQuery();
         try {
             connection = ConnectionFactory.getConnection();
             statement = connection.prepareStatement(query);
@@ -81,15 +100,13 @@ public class AbstractDAO<T> {
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, type.getName() + "DAO:findById " + e.getMessage());
         } finally {
-            ConnectionFactory.close(resultSet);
-            ConnectionFactory.close(statement);
-            ConnectionFactory.close(connection);
+            closeAll(resultSet, statement, connection);
         }
         return null;
     }
 
     private List<T> createObjects(ResultSet resultSet) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         Constructor[] ctors = type.getDeclaredConstructors();
         Constructor ctor = null;
         for (int i = 0; i < ctors.length; i++) {
@@ -117,10 +134,44 @@ public class AbstractDAO<T> {
         return list;
     }
 
-
+    //insert object
     public T insert(T t) {
-        // TODO:
-        return t;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        String raw   = type.getSimpleName().toLowerCase(); // "order"
+        String table = "`" + raw + "`";                     // "`order`"
+        String query = createInsertQuery(table);
+
+        try {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            int idx = 1;
+            for (Field field : type.getDeclaredFields()) {
+                String name = field.getName();
+                if ("id".equalsIgnoreCase(name)) {
+                    continue;
+                }
+                PropertyDescriptor propertyDescriptor = new PropertyDescriptor(name, type);
+                Object value = propertyDescriptor.getReadMethod().invoke(t);
+                statement.setObject(idx++, value);
+            }
+
+            statement.executeUpdate();
+            resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                int newId = resultSet.getInt(1);
+                new PropertyDescriptor("id", type).getWriteMethod().invoke(t, newId);
+            }
+            return t;
+
+        } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException ex) {
+            LOGGER.log(Level.WARNING, type.getName() + " insert error", ex);
+        } finally {
+            closeAll(resultSet, statement, connection);
+        }
+        return null;
     }
 
     public T update(T t) {
