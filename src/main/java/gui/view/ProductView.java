@@ -1,9 +1,11 @@
 package gui.view;
 
 import gui.Controller;
+import model.Product;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class ProductView extends JFrame {
     private final Controller controller;
@@ -12,6 +14,12 @@ public class ProductView extends JFrame {
     private JTextField textPrice;
     private JTextField textQuantity;
     private JButton    btnAddProduct;
+
+    private JComboBox<Product> productComboBox;
+    private JButton            btnDeleteProduct;
+
+    private JComboBox<Product> productEditComboBox;
+    private JButton            btnEditProduct;
 
     public ProductView(String title, Controller controller) {
         super(title);
@@ -24,51 +32,86 @@ public class ProductView extends JFrame {
         setSize(1000, 500);
         setLocationRelativeTo(null);
 
-        // Vom folosi același stil: un singur rând cu FlowLayout
         Container cp = getContentPane();
-        cp.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-        // Name
-        JLabel lblName = new JLabel("Name:");
-        lblName.setFont(lblName.getFont().deriveFont(Font.BOLD, 16f));
-        textName = new JTextField(20);
-        textName.setFont(textName.getFont().deriveFont(Font.PLAIN, 14f));
+        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        row1.add(new JLabel("Name:"));
+        textName = new JTextField(12);
+        row1.add(textName);
 
-        // Price
-        JLabel lblPrice = new JLabel("Price:");
-        lblPrice.setFont(lblPrice.getFont().deriveFont(Font.BOLD, 16f));
-        textPrice = new JTextField(10);
-        textPrice.setFont(textPrice.getFont().deriveFont(Font.PLAIN, 14f));
+        row1.add(new JLabel("Price:"));
+        textPrice = new JTextField(8);
+        row1.add(textPrice);
 
-        // Quantity
-        JLabel lblQuantity = new JLabel("Quantity:");
-        lblQuantity.setFont(lblQuantity.getFont().deriveFont(Font.BOLD, 16f));
-        textQuantity = new JTextField(10);
-        textQuantity.setFont(textQuantity.getFont().deriveFont(Font.PLAIN, 14f));
+        row1.add(new JLabel("Quantity:"));
+        textQuantity = new JTextField(5);
+        row1.add(textQuantity);
 
-        // Add Product button
         btnAddProduct = new JButton("Add Product");
         btnAddProduct.setFont(btnAddProduct.getFont().deriveFont(Font.BOLD, 16f));
         btnAddProduct.addActionListener(e -> {
-            String nameStr = textName.getText();
-            String priceStr = textPrice.getText();
-            String qtyStr = textQuantity.getText();
-
-            controller.handleAddProduct(nameStr, priceStr, qtyStr, this);
-
-            // clear fields on success
+            controller.handleAddProduct(
+                    textName.getText(),
+                    textPrice.getText(),
+                    textQuantity.getText(),
+                    this
+            );
             textName.setText("");
             textPrice.setText("");
             textQuantity.setText("");
+            refreshProducts();
         });
+        row1.add(btnAddProduct);
 
-        // Adăugăm componentele în rând
-        cp.add(lblName);
-        cp.add(textName);
-        cp.add(lblPrice);
-        cp.add(textPrice);
-        cp.add(lblQuantity);
-        cp.add(textQuantity);
-        cp.add(btnAddProduct);
+        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        row2.add(new JLabel("Select Product:"));
+        productComboBox = new JComboBox<>();
+        productComboBox.setFont(productComboBox.getFont().deriveFont(Font.PLAIN, 14f));
+        row2.add(productComboBox);
+
+        btnDeleteProduct = new JButton("Delete Product");
+        btnDeleteProduct.setFont(btnDeleteProduct.getFont().deriveFont(Font.BOLD, 16f));
+        btnDeleteProduct.addActionListener(e -> {
+            Product selected = (Product) productComboBox.getSelectedItem();
+            if (selected != null) {
+                controller.handleDeleteProduct(selected, this);
+                refreshProducts();
+            }
+        });
+        row2.add(btnDeleteProduct);
+
+        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        row3.add(new JLabel("Edit Product:"));
+        productEditComboBox = new JComboBox<>();
+        productEditComboBox.setFont(productEditComboBox.getFont().deriveFont(Font.PLAIN, 14f));
+        row3.add(productEditComboBox);
+
+        btnEditProduct = new JButton("Edit Product");
+        btnEditProduct.setFont(btnEditProduct.getFont().deriveFont(Font.BOLD, 16f));
+        btnEditProduct.addActionListener(e -> {
+            Product selected = (Product) productEditComboBox.getSelectedItem();
+            if (selected != null) {
+                controller.handleOpenEditProductWindow(selected, this);
+            }
+        });
+        row3.add(btnEditProduct);
+
+        // add rows
+        cp.add(row1);
+        cp.add(row2);
+        cp.add(row3);
+
+        refreshProducts();
+    }
+
+    public void refreshProducts() {
+        List<Product> all = controller.getAllProducts();
+        productComboBox.removeAllItems();
+        productEditComboBox.removeAllItems();
+        for (Product p : all) {
+            productComboBox.addItem(p);
+            productEditComboBox.addItem(p);
+        }
     }
 }

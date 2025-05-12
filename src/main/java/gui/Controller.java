@@ -2,6 +2,7 @@ package gui;
 
 import gui.view.ClientView;
 import gui.view.EditClientView;
+import gui.view.EditProductView;
 import gui.view.ProductView;
 import logic.ClientBLL;
 import logic.ProductBLL;
@@ -112,10 +113,10 @@ public class Controller {
             clientBLL.insertClient(name.trim(), address.trim(), email.trim());
 
             JOptionPane.showMessageDialog(parentComponent, "Client added successfully!", "Success",
-                                                                            JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         } catch (IncorrectClientNameException | IncorrectEmailException | IncorrectAddressException ex) {
             JOptionPane.showMessageDialog(parentComponent, ex.getMessage(), "Validation Error",
-                                                                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
         } catch (NoSuchElementException ex) {
             JOptionPane.showMessageDialog(parentComponent,
                     "Failed to insert client: " + ex.getMessage(),
@@ -131,7 +132,7 @@ public class Controller {
             validateProductQuantity(qtyStr);
 
             double price = Double.parseDouble(priceStr.trim());
-            int    qty   = Integer.parseInt(qtyStr.trim());
+            int qty = Integer.parseInt(qtyStr.trim());
 
             productBLL.insertProduct(new Product(name.trim(), price, qty));
 
@@ -140,16 +141,17 @@ public class Controller {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
-        } catch ( IncorrectProductNameException | IncorrectProductPriceException | IncorrectProductQuantityException ex) {
+        } catch (IncorrectProductNameException | IncorrectProductPriceException |
+                 IncorrectProductQuantityException ex) {
             JOptionPane.showMessageDialog(parent,
                     ex.getMessage(),
                     "Validation Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (NoSuchElementException ex) {
-        JOptionPane.showMessageDialog(parent,
-                "Failed to insert product: " + ex.getMessage(),
-                "Insertion Error",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent,
+                    "Failed to insert product: " + ex.getMessage(),
+                    "Insertion Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -157,20 +159,18 @@ public class Controller {
         return clientBLL.findAllClients();
     }
 
+    public List<Product> getAllProducts() {
+        return productBLL.findAllProducts();
+    }
+
     public void handleDeleteClient(Client selectedClient, Component parentComponent) {
         try {
             Client deleted = clientBLL.deleteClient(selectedClient);
-            if (deleted != null) {
-                JOptionPane.showMessageDialog(parentComponent,
-                        "Client \"" + deleted.getName() + "\" has been deleted successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(parentComponent,
-                        "Coudln't delete client!",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(parentComponent,
+                    "Client \"" + deleted.getName() + "\" has been deleted successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(parentComponent,
                     "Delete error: " + ex.getMessage(),
@@ -179,7 +179,20 @@ public class Controller {
         }
     }
 
-    public void handleOpenEditClientWindow(Client selected, ClientView clientView){
+    public void handleDeleteProduct(Product sel, Component parent) {
+        try {
+            Product deleted = productBLL.deleteProduct(sel);
+            JOptionPane.showMessageDialog(parent,
+                    "Product \"" + deleted.getName() + "\" deleted successfully!",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(parent,
+                    "Failed to delete product: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void handleOpenEditClientWindow(Client selected, ClientView clientView) {
         EditClientView editClientView = new EditClientView(selected, this, clientView);
         editClientView.setVisible(true);
     }
@@ -213,7 +226,7 @@ public class Controller {
             }
 
             JOptionPane.showMessageDialog(parent,
-                    "Clientul a fost actualizat cu succes!",
+                    "Client has been updated successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
@@ -230,4 +243,69 @@ public class Controller {
         }
     }
 
+    public void handleOpenEditProductWindow(Product sel, ProductView parent) {
+        EditProductView editProductView = new EditProductView(sel, this, parent);
+        editProductView.setVisible(true);
+    }
+
+    public void handleEditProduct(Product product,
+                                  String newName,
+                                  String newPrice,
+                                  String newQuantity,
+                                  Component parent) {
+        boolean anyUpdated = false;
+        try {
+            // 1) Name
+            if (newName != null && !newName.trim().isEmpty()) {
+                validateProductName(newName);
+                productBLL.updateProductField(product, "name", newName.trim());
+                anyUpdated = true;
+            }
+
+            // 2) Price
+            if (newPrice != null && !newPrice.trim().isEmpty()) {
+                validateProductPrice(newPrice);
+                double priceVal = Double.parseDouble(newPrice.trim());
+                productBLL.updateProductField(product, "price", priceVal);
+                anyUpdated = true;
+            }
+
+            // 3) Quantity
+            if (newQuantity != null && !newQuantity.trim().isEmpty()) {
+                validateProductQuantity(newQuantity);
+                int qtyVal = Integer.parseInt(newQuantity.trim());
+                productBLL.updateProductField(product, "quantity", qtyVal);
+                anyUpdated = true;
+            }
+
+            // 4) Dacă nu s-a completat nimic
+            if (!anyUpdated) {
+                JOptionPane.showMessageDialog(parent,
+                        "You must complete at least one field!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // 5) Success
+            JOptionPane.showMessageDialog(parent,
+                    "Product has been updated successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IncorrectProductNameException
+                 | IncorrectProductPriceException
+                 | IncorrectProductQuantityException ex) {
+            JOptionPane.showMessageDialog(parent,
+                    ex.getMessage(),
+                    "Validation Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+        } catch (NoSuchElementException ex) {
+            JOptionPane.showMessageDialog(parent,
+                    "Error updating product: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }
