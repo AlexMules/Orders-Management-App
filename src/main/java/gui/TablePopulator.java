@@ -30,12 +30,12 @@ public interface TablePopulator {
         // 2) construim matricea de date
         Object[][] data = new Object[items.size()][fields.length];
         for (int row = 0; row < items.size(); row++) {
-            T bean = items.get(row);
+            T obj = items.get(row);
             for (int col = 0; col < fields.length; col++) {
                 String fname = fields[col].getName();
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(fname, type);
-                    data[row][col] = pd.getReadMethod().invoke(bean);
+                    data[row][col] = pd.getReadMethod().invoke(obj);
                 } catch (IntrospectionException
                          | IllegalAccessException
                          | InvocationTargetException ex) {

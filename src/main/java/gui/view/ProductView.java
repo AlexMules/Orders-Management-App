@@ -20,6 +20,7 @@ public class ProductView extends JFrame {
 
     private JComboBox<Product> productEditComboBox;
     private JButton            btnEditProduct;
+    private JButton btnViewAll;
 
     public ProductView(String title, Controller controller) {
         super(title);
@@ -97,10 +98,23 @@ public class ProductView extends JFrame {
         });
         row3.add(btnEditProduct);
 
+        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        btnViewAll = new JButton("View All Products");
+        btnViewAll.setFont(btnViewAll.getFont().deriveFont(Font.BOLD, 16f));
+        btnViewAll.addActionListener(e ->
+                controller.showAllWindow(
+                        "All Products",
+                        controller::getAllProducts
+                )
+        );
+
+        row4.add(btnViewAll);
+
         // add rows
         cp.add(row1);
         cp.add(row2);
         cp.add(row3);
+        cp.add(row4);
 
         refreshProducts();
     }

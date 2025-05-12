@@ -31,7 +31,7 @@ public class MainView extends JFrame {
         btnClient.addActionListener(e -> controller.handleOpenClientWindow());
         btnProduct = makeButton("Open Product Window");
         btnProduct.addActionListener(e -> controller.handleOpenProductWindow());
-        btnOrder = makeButton("Create Order");
+        btnOrder = makeButton("Open Order Window");
         btnOrder.addActionListener(e -> controller.handleOpenCreateOrderWindow());
 
         cp.add(btnClient);

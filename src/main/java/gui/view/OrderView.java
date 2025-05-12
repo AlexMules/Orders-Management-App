@@ -15,6 +15,7 @@ public class OrderView extends JFrame {
     private JComboBox<Product> productCombo;
     private JTextField         qtyField;
     private JButton            btnPlaceOrder;
+    private JButton            btnViewAll;
 
     public OrderView(String title, Controller controller) {
         super(title);
@@ -30,43 +31,61 @@ public class OrderView extends JFrame {
         Container cp = getContentPane();
         cp.setLayout(new BorderLayout(10, 10));
 
-        JPanel center = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        center.add(new JLabel("Client:"));
+        // --- NORTH: place‐order form --------------------
+        JPanel form = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        form.add(new JLabel("Client:"));
         clientCombo = new JComboBox<>();
-        center.add(clientCombo);
+        form.add(clientCombo);
 
-        center.add(new JLabel("Product:"));
+        form.add(new JLabel("Product:"));
         productCombo = new JComboBox<>();
-        center.add(productCombo);
+        form.add(productCombo);
 
-        center.add(new JLabel("Quantity:"));
+        form.add(new JLabel("Quantity:"));
         qtyField = new JTextField(5);
-        center.add(qtyField);
+        form.add(qtyField);
 
         btnPlaceOrder = new JButton("Place Order");
         btnPlaceOrder.setFont(btnPlaceOrder.getFont().deriveFont(Font.BOLD, 14f));
         btnPlaceOrder.addActionListener(e -> {
-                    Client  client  = (Client)  clientCombo.getSelectedItem();
-                    Product product = (Product) productCombo.getSelectedItem();
-                    String  qtyStr  = qtyField.getText();
+            controller.handlePlaceOrder(
+                    (Client) clientCombo.getSelectedItem(),
+                    (Product) productCombo.getSelectedItem(),
+                    qtyField.getText(),
+                    this
+            );
+            qtyField.setText("");
+            refreshLists();
+        });
+        form.add(btnPlaceOrder);
 
-                    controller.handlePlaceOrder(client, product, qtyStr, this);
-                    qtyField.setText("");
-                    refreshLists();
-                });
-        center.add(btnPlaceOrder);
+        cp.add(form, BorderLayout.NORTH);
 
-        cp.add(center, BorderLayout.CENTER);
+        // --- CENTER: View All Orders button ------------
+        JPanel viewAllPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        btnViewAll = new JButton("View All Orders");
+        btnViewAll.setFont(btnViewAll.getFont().deriveFont(Font.BOLD, 16f));
+        btnViewAll.addActionListener(e ->
+                controller.showAllWindow(
+                        "All Orders",
+                        controller::getAllOrders  // <-- orders, not products
+                )
+        );
+        viewAllPanel.add(btnViewAll);
+        cp.add(viewAllPanel, BorderLayout.CENTER);
 
+        // --- SOUTH: Refresh button ---------------------
         JPanel south = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(btnRefresh.getFont().deriveFont(Font.BOLD, 14f));
         btnRefresh.addActionListener(e -> refreshLists());
         south.add(btnRefresh);
-
         cp.add(south, BorderLayout.SOUTH);
+
+        // initial load
         refreshLists();
     }
+
 
     public void refreshLists() {
         clientCombo.removeAllItems();

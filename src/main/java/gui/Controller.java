@@ -12,6 +12,7 @@ import utils.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.List;
 
@@ -162,6 +163,10 @@ public class Controller implements TablePopulator {
 
     public List<Product> getAllProducts() {
         return productBLL.findAllProducts();
+    }
+
+    public List<Order> getAllOrders() {
+        return orderBLL.findAllOrders();
     }
 
     public void handleDeleteClient(Client selectedClient, Component parentComponent) {
@@ -347,8 +352,17 @@ public class Controller implements TablePopulator {
     }
 
     public void handleOpenViewAllTable() {
-        ViewAllTable viewAllTable = new ViewAllTable(this);
+        ViewAllTable viewAllTable = new ViewAllTable("View Table");
         viewAllTable.setVisible(true);
+    }
+
+    public <T> void showAllWindow(String title,
+                                  Supplier<List<T>> dataSupplier) {
+        ViewAllTable<T> view = new ViewAllTable<>(title);
+        List<T> data = dataSupplier.get();
+        // populateTable is your default method from TablePopulator
+        populateTable(view.getTable(), data);
+        view.setVisible(true);
     }
 
 }

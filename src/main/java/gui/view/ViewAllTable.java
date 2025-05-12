@@ -1,23 +1,20 @@
+// src/gui/view/ViewAllTable.java
 package gui.view;
-
-import gui.Controller;
-import model.Client;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-public class ViewAllTable extends JFrame {
-    private final Controller controller;
-    private final JTable      table;
+/**
+ * A reusable window that contains only a JTable (in a scroll pane)
+ * and a Close button.  Data is populated externally via getTable().
+ */
+public class ViewAllTable<T> extends JFrame {
+    private final JTable table;
 
-    public ViewAllTable(Controller controller) {
-        super("All Clients");
-        this.controller = controller;
-        this.table      = new JTable();
-
+    public ViewAllTable(String title) {
+        super(title);
+        this.table = new JTable();
         initGui();
-        loadData();
     }
 
     private void initGui() {
@@ -25,20 +22,27 @@ public class ViewAllTable extends JFrame {
         setSize(800, 400);
         setLocationRelativeTo(null);
 
-        // center: scrollable table
-        getContentPane().setLayout(new BorderLayout(10,10));
-        getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
+        // Use BorderLayout: table in CENTER, Close in SOUTH
+        Container cp = getContentPane();
+        cp.setLayout(new BorderLayout(10, 10));
 
-        // bottom: a Close button
+        // 1) scrollable table
+        JScrollPane scroll = new JScrollPane(table);
+        cp.add(scroll, BorderLayout.CENTER);
+
+        // 2) close button
         JButton btnClose = new JButton("Close");
         btnClose.addActionListener(e -> dispose());
         JPanel south = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         south.add(btnClose);
-        getContentPane().add(south, BorderLayout.SOUTH);
+        cp.add(south, BorderLayout.SOUTH);
     }
 
-    private void loadData() {
-        List<Client> all = controller.getAllClients();
-        controller.populateTable(table, all);
+    /**
+     * Exposes the JTable so callers can do:
+     *   controller.populateTable(view.getTable(), dataList);
+     */
+    public JTable getTable() {
+        return table;
     }
 }
