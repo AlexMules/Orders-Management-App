@@ -351,11 +351,6 @@ public class Controller implements TablePopulator {
         }
     }
 
-    public void handleOpenViewAllTable() {
-        ViewAllTable viewAllTable = new ViewAllTable("View Table");
-        viewAllTable.setVisible(true);
-    }
-
     public <T> void showAllWindow(String title,
                                   Supplier<List<T>> dataSupplier) {
         ViewAllTable<T> view = new ViewAllTable<>(title);
