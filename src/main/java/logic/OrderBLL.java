@@ -37,12 +37,4 @@ public class OrderBLL {
         }
         return orderInserted;
     }
-
-    public Order deleteOrder(Order order) {
-        Order orderDeleted = orderDAO.delete(order);
-        if (orderDeleted == null) {
-            throw new NoSuchElementException("The order was not deleted!");
-        }
-        return orderDeleted;
-    }
 }

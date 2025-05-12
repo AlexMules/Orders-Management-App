@@ -30,13 +30,12 @@ public class ClientBLL {
         return client;
     }
 
-    public Client insertClient(String name, String address, String email) {
+    public void insertClient(String name, String address, String email) {
         Client client = new Client(name, address, email);
         Client clientInserted = clientDAO.insert(client);
         if (clientInserted == null) {
             throw new NoSuchElementException("The client was not inserted!");
         }
-        return clientInserted;
     }
 
     public Client deleteClient(Client client) {
@@ -47,12 +46,11 @@ public class ClientBLL {
         return clientDeleted;
     }
 
-    public Client updateClientField(Client client, String fieldName, Object newValue) {
+    public void updateClientField(Client client, String fieldName, Object newValue) {
         Client clientUpdated = clientDAO.updateField(client, fieldName, newValue);
         if (clientUpdated == null) {
             throw new NoSuchElementException("The client was not updated!");
         }
-        return clientUpdated;
     }
 
 }

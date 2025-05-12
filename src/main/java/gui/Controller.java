@@ -1,6 +1,7 @@
 package gui;
 
 import gui.view.ClientView;
+import gui.view.EditClientView;
 import logic.ClientBLL;
 import model.Client;
 import utils.IncorrectAddressException;
@@ -53,7 +54,7 @@ public class Controller {
     }
 
     public void handleOpenClientWindow() {
-        ClientView clientView = new ClientView("Client Menu");
+        ClientView clientView = new ClientView("Client Menu", this);
         clientView.setVisible(true);
     }
 
@@ -99,6 +100,57 @@ public class Controller {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(parentComponent,
                     "Delete error: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void handleOpenEditClientWindow(Client selected, ClientView clientView){
+        EditClientView editClientView = new EditClientView(selected, this, clientView);
+        editClientView.setVisible(true);
+    }
+
+    public void handleEditClient(Client client, String newName, String newAddress, String newEmail, Component parent) {
+        boolean anyUpdated = false;
+        try {
+            if (newName != null && !newName.trim().isEmpty()) {
+                validateName(newName);
+                clientBLL.updateClientField(client, "name", newName.trim());
+                anyUpdated = true;
+            }
+
+            if (newAddress != null && !newAddress.trim().isEmpty()) {
+                clientBLL.updateClientField(client, "address", newAddress.trim());
+                anyUpdated = true;
+            }
+
+            if (newEmail != null && !newEmail.trim().isEmpty()) {
+                validateEmail(newEmail);
+                clientBLL.updateClientField(client, "email", newEmail.trim());
+                anyUpdated = true;
+            }
+
+            if (!anyUpdated) {
+                JOptionPane.showMessageDialog(parent,
+                        "You must complete at least one field!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            JOptionPane.showMessageDialog(parent,
+                    "Clientul a fost actualizat cu succes!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IncorrectClientNameException | IncorrectEmailException ex) {
+            JOptionPane.showMessageDialog(parent,
+                    ex.getMessage(),
+                    "Validation Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (NoSuchElementException ex) {
+            JOptionPane.showMessageDialog(parent,
+                    "Eroare la actualizare: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }

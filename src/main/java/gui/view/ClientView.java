@@ -7,96 +7,118 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class ClientView extends JFrame{
-    private JTextField nameField;
-    private JTextField addressField;
-    private JTextField emailField;
-    private JButton btnAddClient;
-    private JLabel labelName;
-    private JLabel labelAddress;
-    private JLabel labelEmail;
+public class ClientView extends JFrame {
+    private JTextField textName;
+    private JTextField textAddress;
+    private JTextField textEmail;
+    private JButton     btnAddClient;
 
     private JComboBox<Client> clientComboBox;
-    private JButton btnDeleteClient;
+    private JButton           btnDeleteClient;
 
-    private Controller controller = new Controller();
+    private JComboBox<Client> clientEditComboBox;
+    private JButton           btnEditClient;
 
-    public ClientView(String title) {
+    private Controller controller;
+
+    public ClientView(String title, Controller controller) {
         super(title);
+        this.controller = controller;
         prepareGui();
     }
 
     private void prepareGui() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1000, 600);
+        setSize(1000, 300);
         setLocationRelativeTo(null);
 
+        // Use a vertical BoxLayout on the content pane
         Container cp = getContentPane();
-        cp.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-        labelName = new JLabel("Name:");
-        labelName.setFont(labelName.getFont().deriveFont(Font.BOLD, 16f));
-        nameField = new JTextField(12);
-        nameField.setFont(nameField.getFont().deriveFont(Font.PLAIN, 14f));
-
-        labelAddress = new JLabel("Address:");
-        labelAddress.setFont(labelAddress.getFont().deriveFont(Font.BOLD, 16f));
-        addressField = new JTextField(20);
-        addressField.setFont(addressField.getFont().deriveFont(Font.PLAIN, 14f));
-
-        labelEmail = new JLabel("Email:");
-        labelEmail.setFont(labelEmail.getFont().deriveFont(Font.BOLD, 16f));
-        emailField = new JTextField(18);
-        emailField.setFont(emailField.getFont().deriveFont(Font.PLAIN, 14f));
-
-        btnAddClient = new JButton("Add Client");
+        // Row 1: Name / Address / Email / Add Client
+        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JLabel labelName    = new JLabel("Name:");
+        textName            = new JTextField(12);
+        JLabel labelAddress = new JLabel("Address:");
+        textAddress         = new JTextField(20);
+        JLabel labelEmail   = new JLabel("Email:");
+        textEmail           = new JTextField(18);
+        btnAddClient        = new JButton("Add Client");
         btnAddClient.setFont(btnAddClient.getFont().deriveFont(Font.BOLD, 16f));
         btnAddClient.addActionListener(e -> {
-            String name = nameField.getText();
-            String address = addressField.getText();
-            String email = emailField.getText();
-            controller.handleAddClient(name, address, email, this);
-            nameField.setText("");
-            addressField.setText("");
-            emailField.setText("");
+            controller.handleAddClient(
+                    textName.getText(),
+                    textAddress.getText(),
+                    textEmail.getText(),
+                    this
+            );
+            textName.setText("");
+            textAddress.setText("");
+            textEmail.setText("");
             refreshClients();
         });
 
-        // ComboBox and Delete Button
-        clientComboBox = new JComboBox<>();
-        refreshClients();
+        row1.add(labelName);
+        row1.add(textName);
+        row1.add(labelAddress);
+        row1.add(textAddress);
+        row1.add(labelEmail);
+        row1.add(textEmail);
+        row1.add(btnAddClient);
 
-        btnDeleteClient = new JButton("Delete Client");
+        // Row 2: Select Client / Delete Client
+        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JLabel lblSelect = new JLabel("Select Client:");
+        clientComboBox    = new JComboBox<>();
+        btnDeleteClient   = new JButton("Delete Client");
         btnDeleteClient.setFont(btnDeleteClient.getFont().deriveFont(Font.BOLD, 16f));
         btnDeleteClient.addActionListener(e -> {
-            Client selected = (Client) clientComboBox.getSelectedItem();
-            if (selected != null) {
-                controller.handleDeleteClient(selected, this);
+            Client sel = (Client) clientComboBox.getSelectedItem();
+            if (sel != null) {
+                controller.handleDeleteClient(sel, this);
                 refreshClients();
             }
         });
 
-        cp.add(labelName);
-        cp.add(nameField);
-        cp.add(labelAddress);
-        cp.add(addressField);
-        cp.add(labelEmail);
-        cp.add(emailField);
-        cp.add(btnAddClient);
+        row2.add(lblSelect);
+        row2.add(clientComboBox);
+        row2.add(btnDeleteClient);
 
-        JLabel selectClientLabel = new JLabel("Select Client:");
-        selectClientLabel.setFont(selectClientLabel.getFont().deriveFont(Font.BOLD, 16f));
-        cp.add(selectClientLabel);
-        clientComboBox.setFont(clientComboBox.getFont().deriveFont(Font.PLAIN, 14f));
-        cp.add(clientComboBox);
-        cp.add(btnDeleteClient);
+        // Row 3: Edit Client Combo + Button
+        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JLabel lblEdit   = new JLabel("Edit Client:");
+        clientEditComboBox = new JComboBox<>();
+        btnEditClient      = new JButton("Edit Client");
+        btnEditClient.setFont(btnEditClient.getFont().deriveFont(Font.BOLD, 16f));
+        btnEditClient.addActionListener(e -> {
+            Client selected = (Client) clientEditComboBox.getSelectedItem();
+            if (selected != null) {
+                controller.handleOpenEditClientWindow(selected, this);
+                refreshClients();
+            }
+        });
+
+        row3.add(lblEdit);
+        row3.add(clientEditComboBox);
+        row3.add(btnEditClient);
+
+        // Add all rows to the content pane
+        cp.add(row1);
+        cp.add(row2);
+        cp.add(row3);
+
+        // finally populate the combo-boxes
+        refreshClients();
     }
 
-    private void refreshClients() {
+    protected void refreshClients() {
         clientComboBox.removeAllItems();
+        clientEditComboBox.removeAllItems();
         List<Client> clients = controller.getAllClients();
         for (Client c : clients) {
             clientComboBox.addItem(c);
+            clientEditComboBox.addItem(c);
         }
     }
 }

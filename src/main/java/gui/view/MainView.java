@@ -10,10 +10,11 @@ public class MainView extends JFrame {
     private JButton btnProduct;
     private JButton btnOrder;
 
-    private Controller controller = new Controller();
+    private Controller controller;
 
     public MainView(String title) {
         super(title);
+        this.controller = new Controller();
         prepareGui();
     }
 
