@@ -2,11 +2,12 @@ package gui;
 
 import gui.view.ClientView;
 import gui.view.EditClientView;
+import gui.view.ProductView;
 import logic.ClientBLL;
+import logic.ProductBLL;
 import model.Client;
-import utils.IncorrectAddressException;
-import utils.IncorrectClientNameException;
-import utils.IncorrectEmailException;
+import model.Product;
+import utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,9 +22,11 @@ public class Controller {
     private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z ]+$");
 
     private final ClientBLL clientBLL;
+    private final ProductBLL productBLL;
 
     public Controller() {
         clientBLL = new ClientBLL();
+        productBLL = new ProductBLL();
     }
 
     private void validateEmail(String email) throws IncorrectEmailException {
@@ -36,13 +39,50 @@ public class Controller {
         }
     }
 
-    private void validateName(String name) throws IncorrectClientNameException {
+    private void validateClientName(String name) throws IncorrectClientNameException {
         String nameStr = name.trim();
         if (nameStr.isEmpty()) {
             throw new IncorrectClientNameException("Name field cannot be empty!");
         }
         if (!NAME_PATTERN.matcher(nameStr).matches()) {
             throw new IncorrectClientNameException("Invalid name!");
+        }
+    }
+
+    private void validateProductName(String name) throws IncorrectProductNameException {
+        String nameStr = name.trim();
+        if (nameStr.isEmpty()) {
+            throw new IncorrectProductNameException("Name field cannot be empty!");
+        }
+    }
+
+    private void validateProductPrice(String priceStr) throws IncorrectProductPriceException {
+        String p = priceStr.trim();
+        if (p.isEmpty()) {
+            throw new IncorrectProductPriceException("Price field cannot be empty!");
+        }
+        try {
+            double price = Double.parseDouble(p);
+            if (price <= 0) {
+                throw new IncorrectProductPriceException("Price must be greater than 0!");
+            }
+        } catch (NumberFormatException ex) {
+            throw new IncorrectProductPriceException("Price must be a valid number!");
+        }
+    }
+
+    private void validateProductQuantity(String qtyStr) throws IncorrectProductQuantityException {
+        String q = qtyStr.trim();
+        if (q.isEmpty()) {
+            throw new IncorrectProductQuantityException("Quantity field cannot be empty!");
+        }
+        try {
+            int qty = Integer.parseInt(q);
+            if (qty <= 0) {
+                throw new IncorrectProductQuantityException("Quantity must be greater than 0!");
+            }
+        } catch (NumberFormatException ex) {
+            throw new IncorrectProductQuantityException("Quantity must be a valid integer!");
         }
     }
 
@@ -58,9 +98,14 @@ public class Controller {
         clientView.setVisible(true);
     }
 
+    public void handleOpenProductWindow() {
+        ProductView productView = new ProductView("Product Menu", this);
+        productView.setVisible(true);
+    }
+
     public void handleAddClient(String name, String address, String email, Component parentComponent) {
         try {
-            validateName(name);
+            validateClientName(name);
             validateEmail(email);
             validateAddress(address);
 
@@ -76,6 +121,35 @@ public class Controller {
                     "Failed to insert client: " + ex.getMessage(),
                     "Insertion Error",
                     JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void handleAddProduct(String name, String priceStr, String qtyStr, Component parent) {
+        try {
+            validateProductName(name);
+            validateProductPrice(priceStr);
+            validateProductQuantity(qtyStr);
+
+            double price = Double.parseDouble(priceStr.trim());
+            int    qty   = Integer.parseInt(qtyStr.trim());
+
+            productBLL.insertProduct(new Product(name.trim(), price, qty));
+
+            JOptionPane.showMessageDialog(parent,
+                    "Product added successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch ( IncorrectProductNameException | IncorrectProductPriceException | IncorrectProductQuantityException ex) {
+            JOptionPane.showMessageDialog(parent,
+                    ex.getMessage(),
+                    "Validation Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (NoSuchElementException ex) {
+        JOptionPane.showMessageDialog(parent,
+                "Failed to insert product: " + ex.getMessage(),
+                "Insertion Error",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -114,7 +188,7 @@ public class Controller {
         boolean anyUpdated = false;
         try {
             if (newName != null && !newName.trim().isEmpty()) {
-                validateName(newName);
+                validateClientName(newName);
                 clientBLL.updateClientField(client, "name", newName.trim());
                 anyUpdated = true;
             }

@@ -28,10 +28,11 @@ public class MainView extends JFrame {
         cp.add(Box.createVerticalGlue());
 
         btnClient = makeButton("Open Client Window");
-        btnProduct = makeButton("Open Product Window");
-        btnOrder   = makeButton("Open Order Window");
-
         btnClient.addActionListener(e -> controller.handleOpenClientWindow());
+        btnProduct = makeButton("Open Product Window");
+        btnProduct.addActionListener(e -> controller.handleOpenProductWindow());
+
+        btnOrder   = makeButton("Open Order Window");
 
         cp.add(btnClient);
         cp.add(Box.createVerticalStrut(20));

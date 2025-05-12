@@ -34,7 +34,6 @@ public class EditClientView extends JFrame {
         Container cp = getContentPane();
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-        // Title label
         JLabel title = new JLabel("Editing client");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -42,21 +41,17 @@ public class EditClientView extends JFrame {
         cp.add(title);
         cp.add(Box.createVerticalStrut(20));
 
-        // Fields panel
         JPanel fields = new JPanel(new GridLayout(3, 2, 10, 10));
         fields.setMaximumSize(new Dimension(480, 120));
 
-        // Name
         fields.add(new JLabel("Name:"));
         nameField = new JTextField(client.getName());
         fields.add(nameField);
 
-        // Address
         fields.add(new JLabel("Address:"));
         addressField = new JTextField(client.getAddress());
         fields.add(addressField);
 
-        // Email
         fields.add(new JLabel("Email:"));
         emailField = new JTextField(client.getEmail());
         fields.add(emailField);
@@ -64,7 +59,6 @@ public class EditClientView extends JFrame {
         cp.add(fields);
         cp.add(Box.createVerticalStrut(20));
 
-        // Save button
         btnSave = new JButton("Save");
         btnSave.setFont(btnSave.getFont().deriveFont(Font.BOLD, 16f));
         btnSave.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -72,7 +66,6 @@ public class EditClientView extends JFrame {
             String newName    = nameField.getText();
             String newAddress = addressField.getText();
             String newEmail   = emailField.getText();
-            // Delegate everything to controller
             controller.handleEditClient(client, newName, newAddress, newEmail, this);
             parent.refreshClients();
         });

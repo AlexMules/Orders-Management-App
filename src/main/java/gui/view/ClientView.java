@@ -29,7 +29,7 @@ public class ClientView extends JFrame {
 
     private void prepareGui() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1000, 300);
+        setSize(1000, 500);
         setLocationRelativeTo(null);
 
         // Use a vertical BoxLayout on the content pane
