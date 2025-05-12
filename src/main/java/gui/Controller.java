@@ -360,7 +360,6 @@ public class Controller implements TablePopulator {
                                   Supplier<List<T>> dataSupplier) {
         ViewAllTable<T> view = new ViewAllTable<>(title);
         List<T> data = dataSupplier.get();
-        // populateTable is your default method from TablePopulator
         populateTable(view.getTable(), data);
         view.setVisible(true);
     }
