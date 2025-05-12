@@ -1,12 +1,11 @@
 package gui;
 
-import gui.view.ClientView;
-import gui.view.EditClientView;
-import gui.view.EditProductView;
-import gui.view.ProductView;
+import gui.view.*;
 import logic.ClientBLL;
+import logic.OrderBLL;
 import logic.ProductBLL;
 import model.Client;
+import model.Order;
 import model.Product;
 import utils.*;
 
@@ -16,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 import java.util.List;
 
-public class Controller {
+public class Controller implements TablePopulator {
 
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
@@ -24,10 +23,12 @@ public class Controller {
 
     private final ClientBLL clientBLL;
     private final ProductBLL productBLL;
+    private final OrderBLL orderBLL;
 
     public Controller() {
         clientBLL = new ClientBLL();
         productBLL = new ProductBLL();
+        orderBLL = new OrderBLL();
     }
 
     private void validateEmail(String email) throws IncorrectEmailException {
@@ -243,8 +244,8 @@ public class Controller {
         }
     }
 
-    public void handleOpenEditProductWindow(Product sel, ProductView parent) {
-        EditProductView editProductView = new EditProductView(sel, this, parent);
+    public void handleOpenEditProductWindow(Product selected, ProductView parent) {
+        EditProductView editProductView = new EditProductView(selected, this, parent);
         editProductView.setVisible(true);
     }
 
@@ -308,4 +309,46 @@ public class Controller {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public void handleOpenCreateOrderWindow() {
+        OrderView ov = new OrderView("New Order", this);
+        ov.setVisible(true);
+    }
+
+    public void handlePlaceOrder(Client client, Product product, String qtyStr, Component parent) {
+        try {
+            validateProductQuantity(qtyStr);
+
+            int qty = Integer.parseInt(qtyStr.trim());
+            if (product.getQuantity() < qty) {
+                JOptionPane.showMessageDialog(parent,
+                        "Under-stock! Only " + product.getQuantity() + " items available.",
+                        "Under-stock Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            orderBLL.insertOrder(new Order(client.getName(), product.getName(), qty));
+
+            int newStock = product.getQuantity() - qty;
+            productBLL.updateProductField(product, "quantity", newStock);
+
+            JOptionPane.showMessageDialog(parent,
+                    "Order placed successfully! Stock for \"" + product.getName() +
+                            "\" is now " + newStock,
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(parent,
+                    "Failed to place order: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void handleOpenViewAllTable() {
+        ViewAllTable viewAllTable = new ViewAllTable(this);
+        viewAllTable.setVisible(true);
+    }
+
 }

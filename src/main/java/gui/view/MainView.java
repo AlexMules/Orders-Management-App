@@ -31,8 +31,8 @@ public class MainView extends JFrame {
         btnClient.addActionListener(e -> controller.handleOpenClientWindow());
         btnProduct = makeButton("Open Product Window");
         btnProduct.addActionListener(e -> controller.handleOpenProductWindow());
-
-        btnOrder   = makeButton("Open Order Window");
+        btnOrder = makeButton("Create Order");
+        btnOrder.addActionListener(e -> controller.handleOpenCreateOrderWindow());
 
         cp.add(btnClient);
         cp.add(Box.createVerticalStrut(20));

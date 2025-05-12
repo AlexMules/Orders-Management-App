@@ -9,7 +9,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(int quantity, String clientName, String productName) {
+    public Order(String clientName, String productName, int quantity) {
         super();
         this.quantity = quantity;
         this.clientName = clientName;

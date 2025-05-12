@@ -19,6 +19,8 @@ public class ClientView extends JFrame {
     private JComboBox<Client> clientEditComboBox;
     private JButton           btnEditClient;
 
+    private JButton btnViewAll;
+
     private Controller controller;
 
     public ClientView(String title, Controller controller) {
@@ -103,10 +105,18 @@ public class ClientView extends JFrame {
         row3.add(clientEditComboBox);
         row3.add(btnEditClient);
 
+        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        btnViewAll = new JButton("View All Clients");
+        btnViewAll.setFont(btnViewAll.getFont().deriveFont(Font.BOLD, 16f));
+        btnViewAll.addActionListener(e -> controller.handleOpenViewAllTable());
+        row4.add(btnViewAll);
+        cp.add(row4);
+
         // Add all rows to the content pane
         cp.add(row1);
         cp.add(row2);
         cp.add(row3);
+        cp.add(row4);
 
         // finally populate the combo-boxes
         refreshClients();
