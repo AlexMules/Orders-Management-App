@@ -15,7 +15,6 @@ import connection.ConnectionFactory;
 
 public class AbstractDAO<T> {
     protected static final Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
-
     private final Class<T> type;
 
     @SuppressWarnings("unchecked")

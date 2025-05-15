@@ -30,10 +30,11 @@ public class OrderBLL {
         return order;
     }
 
-    public void insertOrder(Order order) {
-        Order orderInserted = orderDAO.insert(order);
-        if (orderInserted == null) {
+    public Order insertOrder(Order order) {
+        Order inserted = orderDAO.insert(order);
+        if (inserted == null) {
             throw new NoSuchElementException("The order was not inserted!");
         }
+        return inserted;
     }
 }

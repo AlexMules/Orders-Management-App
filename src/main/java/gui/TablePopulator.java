@@ -1,13 +1,12 @@
-// src/gui/util/TablePopulator.java
 package gui;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.beans.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.RecordComponent;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface TablePopulator {
 
@@ -17,38 +16,48 @@ public interface TablePopulator {
             return;
         }
 
-        // inferăm tipul bean-ului din primul element
         Class<?> type = items.getFirst().getClass();
+        String[] colNames;
+        RecordComponent[] recComps = type.isRecord()
+                ? type.getRecordComponents()
+                : null;
 
-        // 1) toate câmpurile declarate din clasa
-        Field[] fields = type.getDeclaredFields();
-        String[] colNames = new String[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            colNames[i] = fields[i].getName();
+        if (recComps != null) {
+            colNames = Arrays.stream(recComps)
+                    .map(RecordComponent::getName)
+                    .toArray(String[]::new);
+        } else {
+            Field[] fields = type.getDeclaredFields();
+            colNames = Arrays.stream(fields)
+                    .map(Field::getName)
+                    .toArray(String[]::new);
         }
 
-        // 2) construim matricea de date
-        Object[][] data = new Object[items.size()][fields.length];
-        for (int row = 0; row < items.size(); row++) {
-            T obj = items.get(row);
-            for (int col = 0; col < fields.length; col++) {
-                String fname = fields[col].getName();
+        Object[][] data = new Object[items.size()][colNames.length];
+        for (int r = 0; r < items.size(); r++) {
+            T obj = items.get(r);
+
+            for (int c = 0; c < colNames.length; c++) {
                 try {
-                    PropertyDescriptor pd = new PropertyDescriptor(fname, type);
-                    data[row][col] = pd.getReadMethod().invoke(obj);
-                } catch (IntrospectionException
-                         | IllegalAccessException
-                         | InvocationTargetException ex) {
-                    data[row][col] = null;
+                    Object value;
+                    if (recComps != null) {
+                        // call recordName() accessor:
+                        value = recComps[c].getAccessor().invoke(obj);
+                    } else {
+                        // JavaBean via PropertyDescriptor
+                        var pd = new PropertyDescriptor(colNames[c], type);
+                        value = pd.getReadMethod().invoke(obj);
+                    }
+                    data[r][c] = value;
+                } catch (Exception e) {
+                    data[r][c] = null;
                 }
             }
         }
 
-        // 3) setăm un model non‐editabil
         DefaultTableModel model = new DefaultTableModel(data, colNames) {
-            @Override public boolean isCellEditable(int r, int c) {
-                return false;
-            }
+            @Override
+            public boolean isCellEditable(int row, int col) { return false; }
         };
         table.setModel(model);
     }

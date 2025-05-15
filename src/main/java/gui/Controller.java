@@ -1,9 +1,11 @@
 package gui;
 
 import gui.view.*;
+import logic.BillBLL;
 import logic.ClientBLL;
 import logic.OrderBLL;
 import logic.ProductBLL;
+import model.Bill;
 import model.Client;
 import model.Order;
 import model.Product;
@@ -25,6 +27,7 @@ public class Controller implements TablePopulator {
     private final ClientBLL clientBLL;
     private final ProductBLL productBLL;
     private final OrderBLL orderBLL;
+    private final BillBLL billBLL = new BillBLL();
 
     public Controller() {
         clientBLL = new ClientBLL();
@@ -299,10 +302,8 @@ public class Controller implements TablePopulator {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
-        } catch (IncorrectProductNameException
-                 | IncorrectProductPriceException
-                 | IncorrectProductQuantityException ex) {
-            JOptionPane.showMessageDialog(parent,
+        } catch (IncorrectProductNameException | IncorrectProductPriceException | IncorrectProductQuantityException ex) {
+                JOptionPane.showMessageDialog(parent,
                     ex.getMessage(),
                     "Validation Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -320,11 +321,16 @@ public class Controller implements TablePopulator {
         ov.setVisible(true);
     }
 
-    public void handlePlaceOrder(Client client, Product product, String qtyStr, Component parent) {
+    public void handlePlaceOrder(Client client,
+                                 Product product,
+                                 String qtyStr,
+                                 Component parent) {
         try {
+            // validate quantity format & positivity
             validateProductQuantity(qtyStr);
-
             int qty = Integer.parseInt(qtyStr.trim());
+
+            // under‐stock check
             if (product.getQuantity() < qty) {
                 JOptionPane.showMessageDialog(parent,
                         "Under-stock! Only " + product.getQuantity() + " items available.",
@@ -333,16 +339,30 @@ public class Controller implements TablePopulator {
                 return;
             }
 
-            orderBLL.insertOrder(new Order(client.getName(), product.getName(), qty));
+            Order insertedOrder = orderBLL.insertOrder(new Order(client.getName(), product.getName(), qty));
+            int orderId = insertedOrder.getId();
 
             int newStock = product.getQuantity() - qty;
             productBLL.updateProductField(product, "quantity", newStock);
 
+            double totalPrice = product.getPrice() * qty;
+            Bill bill = new Bill(0, orderId, client.getName(), product.getName(), qty, totalPrice);
+            Bill savedBill = billBLL.insertBill(bill);
+
             JOptionPane.showMessageDialog(parent,
-                    "Order placed successfully! Stock for \"" + product.getName() +
-                            "\" is now " + newStock,
+                    "Order placed successfully!  Stock for \""
+                            + product.getName() + "\" is now " + newStock +
+                            "\nBill #" + savedBill.id()
+                            + " generated for order #" + orderId,
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IncorrectProductQuantityException ex) {
+            JOptionPane.showMessageDialog(parent,
+                    "Quantity must be a valid integer!",
+                    "Validation Error",
+                    JOptionPane.ERROR_MESSAGE);
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(parent,
                     "Failed to place order: " + ex.getMessage(),
@@ -350,6 +370,7 @@ public class Controller implements TablePopulator {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     public <T> void showAllWindow(String title,
                                   Supplier<List<T>> dataSupplier) {
@@ -359,4 +380,10 @@ public class Controller implements TablePopulator {
         view.setVisible(true);
     }
 
+    public void handleViewBillsWindow() {
+        List<Bill> bills = billBLL.findAllBills();
+        ViewAllTable<Bill> view = new ViewAllTable<>("All Bills");
+        populateTable(view.getTable(), bills);
+        view.setVisible(true);
+    }
 }

@@ -9,6 +9,7 @@ public class MainView extends JFrame {
     private JButton btnClient;
     private JButton btnProduct;
     private JButton btnOrder;
+    private JButton btnViewBills;
 
     private Controller controller;
 
@@ -20,7 +21,7 @@ public class MainView extends JFrame {
 
     private void prepareGui() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
+        setSize(600, 500);
         setLocationRelativeTo(null);
 
         Container cp = getContentPane();
@@ -33,12 +34,16 @@ public class MainView extends JFrame {
         btnProduct.addActionListener(e -> controller.handleOpenProductWindow());
         btnOrder = makeButton("Open Order Window");
         btnOrder.addActionListener(e -> controller.handleOpenCreateOrderWindow());
+        btnViewBills = makeButton("View Bills");
+        btnViewBills.addActionListener(e -> controller.handleViewBillsWindow());
 
         cp.add(btnClient);
         cp.add(Box.createVerticalStrut(20));
         cp.add(btnProduct);
         cp.add(Box.createVerticalStrut(20));
         cp.add(btnOrder);
+        cp.add(Box.createVerticalStrut(20));    // spacer before new button
+        cp.add(btnViewBills);                   // add it here
         cp.add(Box.createVerticalGlue());
     }
 
