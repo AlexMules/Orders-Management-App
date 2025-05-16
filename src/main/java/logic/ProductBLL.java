@@ -31,7 +31,7 @@ public class ProductBLL {
 
     /**
      * Retrieves the product with the given ID.
-     * @param id
+     * @param id the product's id
      * @return the matching {@link Product}
      * @throws NoSuchElementException if not found
      */
@@ -45,16 +45,18 @@ public class ProductBLL {
 
     /**
      * Inserts a new product into the database.
-     * @param product the product to insert
-     * @return the inserted {@link Product} (with its generated ID)
+     *
+     * @param name the product's name
+     * @param price the product's price
+     * @param quantity the product's quantity
      * @throws NoSuchElementException if insertion failed
      */
-    public Product insertProduct(Product product) {
+    public void insertProduct(String name, double price, int quantity) {
+        Product product = new Product(name, price, quantity);
         Product productInserted = productDAO.insert(product);
         if (productInserted == null) {
             throw new NoSuchElementException("The product was not inserted!");
         }
-        return productInserted;
     }
 
     /**
@@ -77,15 +79,13 @@ public class ProductBLL {
      * @param product   the product to update
      * @param fieldName the name of the field/column to change
      * @param newValue  the new value for that field
-     * @return the updated {@link Product}
-     * @throws NoSuchElementException  if the update failed
+     * @throws NoSuchElementException   if the update failed
      * @throws IllegalArgumentException if the field name is invalid
      */
-    public Product updateProductField(Product product, String fieldName, Object newValue) {
+    public void updateProductField(Product product, String fieldName, Object newValue) {
         Product productUpdated = productDAO.updateField(product, fieldName, newValue);
         if (productUpdated == null) {
             throw new NoSuchElementException("The product was not updated!");
         }
-        return productUpdated;
     }
 }

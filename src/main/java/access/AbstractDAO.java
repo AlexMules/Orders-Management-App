@@ -75,9 +75,9 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Closes all resources(resultSet, preparedStatement and connection) used by the DAO. </p>
-     * @param resultSet
-     * @param preparedStatement
-     * @param connection
+     * @param resultSet resultSet
+     * @param preparedStatement preparedStatement
+     * @param connection connection
      */
     private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
         ConnectionFactory.close(resultSet);
@@ -87,8 +87,8 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Closes all resources(statement and connection) used by the DAO. </p>
-     * @param statement
-     * @param connection
+     * @param statement preparedStatement
+     * @param connection connection
      */
     private void closeStatementAndConnection(PreparedStatement statement, Connection connection) {
         ConnectionFactory.close(statement);
@@ -120,7 +120,7 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Finds an object of type T using his ID. </p>
-     * @param id
+     * @param id the object's id
      * @return the object of type T
      */
     public T findById(int id) {
@@ -146,7 +146,7 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Creates a list of objects of type T. </p>
-     * @param resultSet
+     * @param resultSet resultSet
      * @return the list of objects of type T
      */
     private List<T> createObjects(ResultSet resultSet) {
@@ -178,7 +178,7 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Inserts an object of type T in the DB.</p>
-     * @param t
+     * @param t the object to be inserted
      * @return the inserted object
      */
     public T insert(T t) {
@@ -222,7 +222,7 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Deletes an object from the DB. </p>
-     * @param t
+     * @param t the object to be deleted
      * @return the deleted object
      */
     public T delete(T t) {
@@ -260,9 +260,9 @@ public class AbstractDAO<T> {
 
     /**
      * <p> Modifies the specified field of an existing object from the DB. </p>
-     * @param t
-     * @param fieldName
-     * @param newValue
+     * @param t the object to be edited/updated
+     * @param fieldName the name of the field to be modified
+     * @param newValue the new value of the field to be modified
      * @return the modified object
      */
     public T updateField(T t, String fieldName, Object newValue) {

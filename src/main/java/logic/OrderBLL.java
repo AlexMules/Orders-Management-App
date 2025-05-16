@@ -50,11 +50,14 @@ public class OrderBLL {
     /**
      * Inserts a new order into the database.
      *
-     * @param order the {@link Order} to insert
+     * @param clientName the name of the client who made the order
+     * @param productName the name of the ordered product
+     * @param quantity the ordered quantity
      * @return the inserted {@link Order}, with its generated ID populated
      * @throws NoSuchElementException if insertion fails
      */
-    public Order insertOrder(Order order) {
+    public Order insertOrder(String clientName, String productName, int quantity) {
+        Order order = new Order(clientName, productName, quantity);
         Order inserted = orderDAO.insert(order);
         if (inserted == null) {
             throw new NoSuchElementException("The order was not inserted!");

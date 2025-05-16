@@ -55,9 +55,9 @@ public class BillDAO {
 
     /**
      * <p> Closes all resources(resultSet, preparedStatement and connection) used by the BillDAO.</p>
-     * @param resultSet
-     * @param preparedStatement
-     * @param connection
+     * @param resultSet resultSet
+     * @param preparedStatement preparedStatement
+     * @param connection connection
      */
     private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
         ConnectionFactory.close(resultSet);
@@ -67,7 +67,7 @@ public class BillDAO {
 
     /**
      * <p> Inserts a Bill record in the DB. </p>
-     * @param bill
+     * @param bill the bill to be inserted
      * @return the inserted Bill record
      */
     public Bill insert(Bill bill) {

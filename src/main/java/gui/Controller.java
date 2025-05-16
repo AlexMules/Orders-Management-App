@@ -164,7 +164,7 @@ public class Controller implements TablePopulator {
             double price = Double.parseDouble(priceStr.trim());
             int qty = Integer.parseInt(qtyStr.trim());
 
-            productBLL.insertProduct(new Product(name.trim(), price, qty));
+            productBLL.insertProduct(name.trim(), price, qty);
 
             JOptionPane.showMessageDialog(parent,
                     "Product added successfully!",
@@ -337,15 +337,15 @@ public class Controller implements TablePopulator {
                 return;
             }
 
-            Order insertedOrder = orderBLL.insertOrder(new Order(client.getName(), product.getName(), qty));
+            Order insertedOrder = orderBLL.insertOrder(client.getName(), product.getName(), qty);
             int orderId = insertedOrder.getId();
 
             int newStock = product.getQuantity() - qty;
             productBLL.updateProductField(product, "quantity", newStock);
 
             double totalPrice = product.getPrice() * qty;
-            Bill bill = new Bill(0, orderId, client.getName(), product.getName(), qty, totalPrice);
-            Bill savedBill = billBLL.insertBill(bill);
+
+            Bill savedBill = billBLL.insertBill(0, orderId, client.getName(), product.getName(), qty, totalPrice);
 
             JOptionPane.showMessageDialog(parent,
                     "Order placed successfully!  Stock for \""
