@@ -57,14 +57,19 @@ public class OrderView extends JFrame {
         });
         form.add(btnPlaceOrder);
 
-        cp.add(form, BorderLayout.NORTH);
-
         JPanel viewAllPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         btnViewAll = new JButton("View All Orders");
         btnViewAll.setFont(btnViewAll.getFont().deriveFont(Font.BOLD, 16f));
         btnViewAll.addActionListener(e -> controller.showAllWindow("All Orders", controller::getAllOrders));
         viewAllPanel.add(btnViewAll);
-        cp.add(viewAllPanel, BorderLayout.CENTER);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.add(Box.createVerticalStrut(50));  // push down 50px
+        topPanel.add(form);
+        topPanel.add(Box.createVerticalStrut(20));  // small gap
+        topPanel.add(viewAllPanel);
+        cp.add(topPanel, BorderLayout.CENTER);
 
         JPanel south = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnRefresh = new JButton("Refresh");

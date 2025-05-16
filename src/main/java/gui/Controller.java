@@ -159,8 +159,7 @@ public class Controller implements TablePopulator {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
-        } catch (IncorrectProductNameException | IncorrectProductPriceException |
-                 IncorrectProductQuantityException ex) {
+        } catch (IncorrectProductNameException | IncorrectProductPriceException | IncorrectProductQuantityException ex) {
             JOptionPane.showMessageDialog(parent,
                     ex.getMessage(),
                     "Validation Error",
@@ -258,11 +257,7 @@ public class Controller implements TablePopulator {
         editProductView.setVisible(true);
     }
 
-    public void handleEditProduct(Product product,
-                                  String newName,
-                                  String newPrice,
-                                  String newQuantity,
-                                  Component parent) {
+    public void handleEditProduct(Product product, String newName, String newPrice, String newQuantity, Component parent) {
         boolean anyUpdated = false;
         try {
             if (newName != null && !newName.trim().isEmpty()) {
@@ -313,14 +308,11 @@ public class Controller implements TablePopulator {
     }
 
     public void handleOpenCreateOrderWindow() {
-        OrderView orderView = new OrderView("New Order", this);
+        OrderView orderView = new OrderView("Order Menu", this);
         orderView.setVisible(true);
     }
 
-    public void handlePlaceOrder(Client client,
-                                 Product product,
-                                 String qtyStr,
-                                 Component parent) {
+    public void handlePlaceOrder(Client client, Product product, String qtyStr, Component parent) {
         try {
             validateProductQuantity(qtyStr);
             int qty = Integer.parseInt(qtyStr.trim());
@@ -365,8 +357,7 @@ public class Controller implements TablePopulator {
         }
     }
 
-    public <T> void showAllWindow(String title,
-                                  Supplier<List<T>> dataSupplier) {
+    public <T> void showAllWindow(String title, Supplier<List<T>> dataSupplier) {
         ViewAllTable<T> view = new ViewAllTable<>(title);
         List<T> data = dataSupplier.get();
         populateTable(view.getTable(), data);
