@@ -3,7 +3,10 @@ package gui.view;
 import javax.swing.*;
 import java.awt.*;
 
-public class ViewAllTable<T> extends JFrame {
+/**
+ * A scrollable window for displaying any list of items in a JTable.
+ */
+public class ViewAllTable extends JFrame {
     private final JTable table;
 
     public ViewAllTable(String title) {

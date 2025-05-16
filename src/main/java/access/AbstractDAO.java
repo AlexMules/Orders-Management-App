@@ -13,7 +13,12 @@ import java.util.stream.Collectors;
 
 import connection.ConnectionFactory;
 
-
+/**
+ * <p> A generic Data Access Object (DAO) base class that provides
+ * common CRUD operations for any domain entity T, using reflection
+ * and introspection to map fields to table columns. </p>
+ * @param <T>
+ */
 public class AbstractDAO<T> {
     protected static final Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
     private final Class<T> type;
@@ -23,6 +28,10 @@ public class AbstractDAO<T> {
         this.type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
+    /**
+     * <p> Creates the query for finding the object using his ID.</p>
+     * @return the query as a string
+     */
     private String createFindByIDSelectQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
@@ -33,6 +42,10 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * <p> Creates the query for finding all objects.</p>
+     * @return the query as a string
+     */
     private String createFindAllSelectQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
@@ -42,6 +55,11 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * <p> Creates the query for inserting an object in the DB. </p>
+     * @param table name as a string
+     * @return the query as a string
+     */
     private String createInsertQuery(String table) {
         var cols = Arrays.stream(type.getDeclaredFields())
                 .map(Field::getName)
@@ -55,18 +73,32 @@ public class AbstractDAO<T> {
         return "INSERT INTO " + table + " (" + colsPart + ") VALUES (" + placeholders + ")";
     }
 
+    /**
+     * <p> Closes all resources(resultSet, preparedStatement and connection) used by the DAO. </p>
+     * @param resultSet
+     * @param preparedStatement
+     * @param connection
+     */
     private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
         ConnectionFactory.close(resultSet);
         ConnectionFactory.close(preparedStatement);
         ConnectionFactory.close(connection);
     }
 
+    /**
+     * <p> Closes all resources(statement and connection) used by the DAO. </p>
+     * @param statement
+     * @param connection
+     */
     private void closeStatementAndConnection(PreparedStatement statement, Connection connection) {
         ConnectionFactory.close(statement);
         ConnectionFactory.close(connection);
     }
 
-    //find object
+    /**
+     * <p> Finds all objects of type T. </p>
+     * @return a list of objects of type T
+     */
     public List<T> findAll() {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -86,7 +118,11 @@ public class AbstractDAO<T> {
         return null;
     }
 
-    //find object
+    /**
+     * <p> Finds an object of type T using his ID. </p>
+     * @param id
+     * @return the object of type T
+     */
     public T findById(int id) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -108,6 +144,11 @@ public class AbstractDAO<T> {
         return null;
     }
 
+    /**
+     * <p> Creates a list of objects of type T. </p>
+     * @param resultSet
+     * @return the list of objects of type T
+     */
     private List<T> createObjects(ResultSet resultSet) {
         List<T> list = new ArrayList<>();
         @SuppressWarnings("unchecked")
@@ -135,7 +176,11 @@ public class AbstractDAO<T> {
         return list;
     }
 
-    //insert object
+    /**
+     * <p> Inserts an object of type T in the DB.</p>
+     * @param t
+     * @return the inserted object
+     */
     public T insert(T t) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -175,7 +220,11 @@ public class AbstractDAO<T> {
         return null;
     }
 
-    //delete object
+    /**
+     * <p> Deletes an object from the DB. </p>
+     * @param t
+     * @return the deleted object
+     */
     public T delete(T t) {
         Connection connection   = null;
         PreparedStatement statement  = null;
@@ -209,6 +258,13 @@ public class AbstractDAO<T> {
         return null;
     }
 
+    /**
+     * <p> Modifies the specified field of an existing object from the DB. </p>
+     * @param t
+     * @param fieldName
+     * @param newValue
+     * @return the modified object
+     */
     public T updateField(T t, String fieldName, Object newValue) {
         if (fieldName.equalsIgnoreCase("id")) {
             throw new IllegalArgumentException("Cannot update the 'id' field");

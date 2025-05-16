@@ -18,6 +18,18 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.List;
 
+/**
+ * <p> Central GUI controller that mediates between Swing views and the
+ * business-logic layer (ClientBLL, ProductBLL, OrderBLL, BillBLL). </p>
+ *
+ * <p> This class is responsible for:
+ *  <ul>
+ *     <li>Opening and wiring up all windows (ClientView, ProductView, OrderView, EditClientView, EditProductView, ViewAllTable).</li>
+ *     <li>Validating user input (names, emails, addresses, prices, quantities) and throwing domain-specific exceptions.</li>
+ *     <li>Delegating CRUD operations to the BLL classes.</li>
+ *     <li>Populating {@link JTable}s via the {@link TablePopulator} interface.</li>
+ *  </ul>
+ */
 public class Controller implements TablePopulator {
 
     private static final Pattern EMAIL_PATTERN =
@@ -358,7 +370,7 @@ public class Controller implements TablePopulator {
     }
 
     public <T> void showAllWindow(String title, Supplier<List<T>> dataSupplier) {
-        ViewAllTable<T> view = new ViewAllTable<>(title);
+        ViewAllTable view = new ViewAllTable(title);
         List<T> data = dataSupplier.get();
         populateTable(view.getTable(), data);
         view.setVisible(true);
@@ -366,7 +378,7 @@ public class Controller implements TablePopulator {
 
     public void handleViewBillsWindow() {
         List<Bill> bills = billBLL.findAllBills();
-        ViewAllTable<Bill> view = new ViewAllTable<>("All Bills");
+        ViewAllTable view = new ViewAllTable("All Bills");
         populateTable(view.getTable(), bills);
         view.setVisible(true);
     }

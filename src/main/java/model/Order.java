@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * <p> Represents an order in the database, with a unique identifier, the name of the client, the name of the product,
+ * and the quantity of the ordered product.</p>
+ */
 public class Order {
     private int id;
     private String clientName;

@@ -6,6 +6,9 @@ import model.Product;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Swing GUI window for editing an existing product’s details.
+ */
 public class EditProductView extends JFrame {
     private final Product product;
     private final Controller controller;
@@ -14,7 +17,7 @@ public class EditProductView extends JFrame {
     private JTextField nameField;
     private JTextField priceField;
     private JTextField quantityField;
-    private JButton    btnSave;
+    private JButton btnSave;
 
     public EditProductView(Product product, Controller controller, ProductView parent) {
         super("Editing product");

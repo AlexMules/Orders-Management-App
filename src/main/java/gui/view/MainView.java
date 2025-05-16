@@ -5,6 +5,9 @@ import gui.Controller;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The main application window providing navigation to all sub‐views.
+ */
 public class MainView extends JFrame {
     private JButton btnClient;
     private JButton btnProduct;

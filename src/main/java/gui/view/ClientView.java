@@ -7,17 +7,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Swing GUI window for managing clients.
+ */
 public class ClientView extends JFrame {
     private JTextField textName;
     private JTextField textAddress;
     private JTextField textEmail;
-    private JButton     btnAddClient;
+    private JButton btnAddClient;
 
     private JComboBox<Client> clientComboBox;
-    private JButton           btnDeleteClient;
+    private JButton btnDeleteClient;
 
     private JComboBox<Client> clientEditComboBox;
-    private JButton           btnEditClient;
+    private JButton btnEditClient;
     private JButton btnViewAll;
 
     private Controller controller;

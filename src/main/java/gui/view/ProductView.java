@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Swing GUI window for managing products.
+ */
 public class ProductView extends JFrame {
     private final Controller controller;
 

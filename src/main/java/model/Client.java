@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * <p> Represents a client in the database, with a unique identifier, a name, an address, and an email. </p>
+ */
 public class Client {
     private int id;
     private String name;

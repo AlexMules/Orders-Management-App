@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * <p> Represents a product in inventory, with a unique identifier, a name, a price, and a stock quantity. </p>
+ */
 public class Product {
     private int id;
     private String name;

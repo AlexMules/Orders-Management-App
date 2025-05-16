@@ -13,10 +13,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * DAO (Data Access Object) for {@link Bill} records.
+ * <p> No updates or deletes are supported, since bills are append-only. </p>
+ */
 public class BillDAO {
     protected static final Logger LOGGER = Logger.getLogger(BillDAO.class.getName());
     private final Class<Bill> type = Bill.class;
 
+    /**
+     * <p> Creates the query for inserting a Bill record in the DB. </p>
+     * @return the query as a string
+     */
     private String createInsertQuery() {
         StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
@@ -37,16 +45,31 @@ public class BillDAO {
         return "INSERT INTO `log` (" + columns + ") VALUES (" + values + ")";
     }
 
+    /**
+     * <p> Creates the query for finding all Bill records. </p>
+     * @return the query as a string
+     */
     private String createFindAllQuery() {
         return "SELECT * FROM `log`";
     }
 
-    private void closeAll(ResultSet rs, PreparedStatement ps, Connection conn) {
-        ConnectionFactory.close(rs);
-        ConnectionFactory.close(ps);
-        ConnectionFactory.close(conn);
+    /**
+     * <p> Closes all resources(resultSet, preparedStatement and connection) used by the BillDAO.</p>
+     * @param resultSet
+     * @param preparedStatement
+     * @param connection
+     */
+    private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
+        ConnectionFactory.close(resultSet);
+        ConnectionFactory.close(preparedStatement);
+        ConnectionFactory.close(connection);
     }
 
+    /**
+     * <p> Inserts a Bill record in the DB. </p>
+     * @param bill
+     * @return the inserted Bill record
+     */
     public Bill insert(Bill bill) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -89,7 +112,10 @@ public class BillDAO {
         return null;
     }
 
-
+    /**
+     * <p> Finds all Bill records. </p>
+     * @return a list of Bill records
+     */
     public List<Bill> findAll() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;

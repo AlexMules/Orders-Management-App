@@ -2,6 +2,9 @@ package access;
 
 import model.Order;
 
+/**
+ * DAO (Data Access Object) for {@link Order} entities.
+ */
 public class OrderDAO extends AbstractDAO<Order> {
     public Order delete(Order order){
         throw new UnsupportedOperationException("Delete not allowed for Order!");

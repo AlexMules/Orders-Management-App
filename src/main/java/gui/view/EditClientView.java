@@ -6,6 +6,9 @@ import model.Client;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Swing GUI window for editing an existing client’s details.
+ */
 public class EditClientView extends JFrame {
     private final Client client;
     private final Controller controller;

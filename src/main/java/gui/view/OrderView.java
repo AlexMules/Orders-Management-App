@@ -7,14 +7,17 @@ import model.Product;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Swing GUI window for creating and viewing orders.
+ */
 public class OrderView extends JFrame {
     private final Controller controller;
 
     private JComboBox<Client>  clientCombo;
     private JComboBox<Product> productCombo;
-    private JTextField         qtyField;
-    private JButton            btnPlaceOrder;
-    private JButton            btnViewAll;
+    private JTextField qtyField;
+    private JButton btnPlaceOrder;
+    private JButton btnViewAll;
 
     public OrderView(String title, Controller controller) {
         super(title);
