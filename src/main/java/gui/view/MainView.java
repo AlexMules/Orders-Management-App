@@ -42,8 +42,8 @@ public class MainView extends JFrame {
         cp.add(btnProduct);
         cp.add(Box.createVerticalStrut(20));
         cp.add(btnOrder);
-        cp.add(Box.createVerticalStrut(20));    // spacer before new button
-        cp.add(btnViewBills);                   // add it here
+        cp.add(Box.createVerticalStrut(20));
+        cp.add(btnViewBills);
         cp.add(Box.createVerticalGlue());
     }
 

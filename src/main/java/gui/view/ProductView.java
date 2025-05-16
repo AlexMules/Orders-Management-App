@@ -13,14 +13,13 @@ public class ProductView extends JFrame {
     private JTextField textName;
     private JTextField textPrice;
     private JTextField textQuantity;
-    private JButton    btnAddProduct;
+    private JButton btnAddProduct;
+    private JButton btnDeleteProduct;
+    private JButton btnEditProduct;
+    private JButton btnViewAll;
 
     private JComboBox<Product> productComboBox;
-    private JButton            btnDeleteProduct;
-
     private JComboBox<Product> productEditComboBox;
-    private JButton            btnEditProduct;
-    private JButton btnViewAll;
 
     public ProductView(String title, Controller controller) {
         super(title);
@@ -110,7 +109,6 @@ public class ProductView extends JFrame {
 
         row4.add(btnViewAll);
 
-        // add rows
         cp.add(row1);
         cp.add(row2);
         cp.add(row3);
@@ -119,7 +117,7 @@ public class ProductView extends JFrame {
         refreshProducts();
     }
 
-    public void refreshProducts() {
+    protected void refreshProducts() {
         List<Product> all = controller.getAllProducts();
         productComboBox.removeAllItems();
         productEditComboBox.removeAllItems();

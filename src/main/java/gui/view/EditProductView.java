@@ -1,4 +1,3 @@
-// src/gui/view/EditProductView.java
 package gui.view;
 
 import gui.Controller;
@@ -17,9 +16,7 @@ public class EditProductView extends JFrame {
     private JTextField quantityField;
     private JButton    btnSave;
 
-    public EditProductView(Product product,
-                           Controller controller,
-                           ProductView parent) {
+    public EditProductView(Product product, Controller controller, ProductView parent) {
         super("Editing product");
         this.product    = product;
         this.controller = controller;

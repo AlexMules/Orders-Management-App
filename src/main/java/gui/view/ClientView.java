@@ -33,11 +33,9 @@ public class ClientView extends JFrame {
         setSize(1000, 500);
         setLocationRelativeTo(null);
 
-        // Use a vertical BoxLayout on the content pane
         Container cp = getContentPane();
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-        // Row 1: Name / Address / Email / Add Client
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JLabel labelName    = new JLabel("Name:");
         textName            = new JTextField(12);
@@ -68,7 +66,6 @@ public class ClientView extends JFrame {
         row1.add(textEmail);
         row1.add(btnAddClient);
 
-        // Row 2: Select Client / Delete Client
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JLabel lblSelect = new JLabel("Select Client:");
         clientComboBox    = new JComboBox<>();
@@ -86,7 +83,6 @@ public class ClientView extends JFrame {
         row2.add(clientComboBox);
         row2.add(btnDeleteClient);
 
-        // Row 3: Edit Client Combo + Button
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JLabel lblEdit   = new JLabel("Edit Client:");
         clientEditComboBox = new JComboBox<>();
@@ -107,21 +103,14 @@ public class ClientView extends JFrame {
         JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         btnViewAll = new JButton("View All Clients");
         btnViewAll.setFont(btnViewAll.getFont().deriveFont(Font.BOLD, 16f));
-        btnViewAll.addActionListener(e ->
-                controller.showAllWindow(
-                        "All Clients",
-                        controller::getAllClients
-                )
-        );
+        btnViewAll.addActionListener(e -> controller.showAllWindow("All Clients", controller::getAllClients));
         row4.add(btnViewAll);
 
-        // Add all rows to the content pane
         cp.add(row1);
         cp.add(row2);
         cp.add(row3);
         cp.add(row4);
 
-        // finally populate the combo-boxes
         refreshClients();
     }
 

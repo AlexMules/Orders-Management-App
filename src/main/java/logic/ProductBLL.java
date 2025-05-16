@@ -25,7 +25,7 @@ public class ProductBLL {
     public Product findProductById(int id) {
         Product product = productDAO.findById(id);
         if (product == null) {
-            throw new NoSuchElementException("The product with id =" + id + " was not found!");
+            throw new NoSuchElementException("The product with id = " + id + " was not found!");
         }
         return product;
     }

@@ -3,8 +3,6 @@ package access;
 import connection.ConnectionFactory;
 import model.Bill;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,21 +18,23 @@ public class BillDAO {
     private final Class<Bill> type = Bill.class;
 
     private String createInsertQuery() {
-        StringBuilder cols = new StringBuilder();
-        StringBuilder vals = new StringBuilder();
+        StringBuilder columns = new StringBuilder();
+        StringBuilder values = new StringBuilder();
         boolean first = true;
         for (Field f : type.getDeclaredFields()) {
             String name = f.getName();
-            if ("id".equalsIgnoreCase(name)) continue;
-            if (!first) {
-                cols.append(", ");
-                vals.append(", ");
+            if (name.equalsIgnoreCase("id")){
+                continue;
             }
-            cols.append(name);
-            vals.append("?");
+            if (!first) {
+                columns.append(", ");
+                values.append(", ");
+            }
+            columns.append(name);
+            values.append("?");
             first = false;
         }
-        return "INSERT INTO `log` (" + cols + ") VALUES (" + vals + ")";
+        return "INSERT INTO `log` (" + columns + ") VALUES (" + values + ")";
     }
 
     private String createFindAllQuery() {
@@ -48,52 +48,43 @@ public class BillDAO {
     }
 
     public Bill insert(Bill bill) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         try {
-            conn = ConnectionFactory.getConnection();
-            String sql = createInsertQuery();
-            ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            connection = ConnectionFactory.getConnection();
+            String query = createInsertQuery();
+            preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             int idx = 1;
             for (Field f : type.getDeclaredFields()) {
                 String name = f.getName();
-                if ("id".equalsIgnoreCase(name)) continue;
+                if ("id".equalsIgnoreCase(name)){
+                    continue;
+                }
                 Method accessor = type.getMethod(name);
                 Object value = accessor.invoke(bill);
-                ps.setObject(idx++, value);
+                preparedStatement.setObject(idx++, value);
             }
 
-            int updated = ps.executeUpdate();
+            int updated = preparedStatement.executeUpdate();
             if (updated == 0) {
                 LOGGER.warning("Inserting bill failed, no rows affected.");
                 return null;
             }
 
-            rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                int newId = rs.getInt(1);
-                // return a fresh Bill record with the DB-generated id
-                return new Bill(
-                        newId,
-                        bill.idOrder(),
-                        bill.clientName(),
-                        bill.productName(),
-                        bill.quantity(),
-                        bill.price()
-                );
+            resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                int newId = resultSet.getInt(1);
+                return new Bill(newId, bill.idOrder(), bill.clientName(), bill.productName(), bill.quantity(), bill.price());
             } else {
                 LOGGER.warning("Inserting bill failed, no ID obtained.");
             }
 
-        } catch (SQLException
-                 | NoSuchMethodException
-                 | IllegalAccessException
-                 | InvocationTargetException ex) {
+        } catch (SQLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.log(Level.SEVERE, "Error inserting Bill", ex);
         } finally {
-            closeAll(rs, ps, conn);
+            closeAll(resultSet, preparedStatement, connection);
         }
         return null;
     }

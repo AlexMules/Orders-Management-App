@@ -18,46 +18,36 @@ public interface TablePopulator {
 
         Class<?> type = items.getFirst().getClass();
         String[] colNames;
-        RecordComponent[] recComps = type.isRecord()
-                ? type.getRecordComponents()
-                : null;
+        RecordComponent[] recComps = type.isRecord() ? type.getRecordComponents() : null;
 
         if (recComps != null) {
-            colNames = Arrays.stream(recComps)
-                    .map(RecordComponent::getName)
-                    .toArray(String[]::new);
+            colNames = Arrays.stream(recComps).map(RecordComponent::getName).toArray(String[]::new);
         } else {
-            Field[] fields = type.getDeclaredFields();
-            colNames = Arrays.stream(fields)
-                    .map(Field::getName)
-                    .toArray(String[]::new);
+            colNames = Arrays.stream(type.getDeclaredFields()).map(Field::getName).toArray(String[]::new);
         }
 
-        Object[][] data = new Object[items.size()][colNames.length];
-        for (int r = 0; r < items.size(); r++) {
-            T obj = items.get(r);
-
-            for (int c = 0; c < colNames.length; c++) {
-                try {
-                    Object value;
-                    if (recComps != null) {
-                        // call recordName() accessor:
-                        value = recComps[c].getAccessor().invoke(obj);
-                    } else {
-                        // JavaBean via PropertyDescriptor
-                        var pd = new PropertyDescriptor(colNames[c], type);
-                        value = pd.getReadMethod().invoke(obj);
-                    }
-                    data[r][c] = value;
-                } catch (Exception e) {
-                    data[r][c] = null;
-                }
-            }
-        }
+        Object[][] data = items.stream()
+                .map(obj -> Arrays.stream(colNames)
+                        .map(col -> {
+                            try {
+                                if (recComps != null) {
+                                    return recComps[Arrays.asList(colNames).indexOf(col)].getAccessor().invoke(obj);
+                                } else {
+                                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(col, type);
+                                    return propertyDescriptor.getReadMethod().invoke(obj);
+                                }
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        })
+                        .toArray(Object[]::new)
+                )
+                .toArray(Object[][]::new);
 
         DefaultTableModel model = new DefaultTableModel(data, colNames) {
-            @Override
-            public boolean isCellEditable(int row, int col) { return false; }
+            @Override public boolean isCellEditable(int row, int col) {
+                return false;
+            }
         };
         table.setModel(model);
     }

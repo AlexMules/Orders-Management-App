@@ -1,4 +1,3 @@
-// src/gui/view/OrderView.java
 package gui.view;
 
 import gui.Controller;
@@ -31,7 +30,6 @@ public class OrderView extends JFrame {
         Container cp = getContentPane();
         cp.setLayout(new BorderLayout(10, 10));
 
-        // --- NORTH: place‐order form --------------------
         JPanel form = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         form.add(new JLabel("Client:"));
         clientCombo = new JComboBox<>();
@@ -61,20 +59,13 @@ public class OrderView extends JFrame {
 
         cp.add(form, BorderLayout.NORTH);
 
-        // --- CENTER: View All Orders button ------------
         JPanel viewAllPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         btnViewAll = new JButton("View All Orders");
         btnViewAll.setFont(btnViewAll.getFont().deriveFont(Font.BOLD, 16f));
-        btnViewAll.addActionListener(e ->
-                controller.showAllWindow(
-                        "All Orders",
-                        controller::getAllOrders  // <-- orders, not products
-                )
-        );
+        btnViewAll.addActionListener(e -> controller.showAllWindow("All Orders", controller::getAllOrders));
         viewAllPanel.add(btnViewAll);
         cp.add(viewAllPanel, BorderLayout.CENTER);
 
-        // --- SOUTH: Refresh button ---------------------
         JPanel south = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(btnRefresh.getFont().deriveFont(Font.BOLD, 14f));
@@ -82,12 +73,10 @@ public class OrderView extends JFrame {
         south.add(btnRefresh);
         cp.add(south, BorderLayout.SOUTH);
 
-        // initial load
         refreshLists();
     }
 
-
-    public void refreshLists() {
+    private void refreshLists() {
         clientCombo.removeAllItems();
         for (Client c : controller.getAllClients()) {
             clientCombo.addItem(c);

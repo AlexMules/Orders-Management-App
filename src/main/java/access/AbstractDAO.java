@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import connection.ConnectionFactory;
 
@@ -42,20 +43,16 @@ public class AbstractDAO<T> {
     }
 
     private String createInsertQuery(String table) {
-        List<String> cols = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-
-        for (Field f : type.getDeclaredFields()) {
-            String name = f.getName();
-            if ("id".equalsIgnoreCase(name)) continue;
-            cols.add(name);
-            if (!sb.isEmpty()) sb.append(", ");
-            sb.append("?");
-        }
+        var cols = Arrays.stream(type.getDeclaredFields())
+                .map(Field::getName)
+                .filter(n -> !n.equalsIgnoreCase("id"))
+                .collect(Collectors.toList());
 
         String colsPart = String.join(", ", cols);
-        return "INSERT INTO " + table +
-                " (" + colsPart + ") VALUES (" + sb + ")";
+
+        String placeholders = cols.stream().map(c -> "?").collect(Collectors.joining(", "));
+
+        return "INSERT INTO " + table + " (" + colsPart + ") VALUES (" + placeholders + ")";
     }
 
     private void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
@@ -101,7 +98,8 @@ public class AbstractDAO<T> {
             statement.setInt(1, id);
             resultSet = statement.executeQuery();
 
-            return createObjects(resultSet).get(0);
+            List<T> list = createObjects(resultSet);
+            return list.stream().findFirst().orElse(null);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, type.getName() + "DAO:findById " + e.getMessage());
         } finally {
@@ -112,17 +110,15 @@ public class AbstractDAO<T> {
 
     private List<T> createObjects(ResultSet resultSet) {
         List<T> list = new ArrayList<>();
-        Constructor[] ctors = type.getDeclaredConstructors();
-        Constructor ctor = null;
-        for (int i = 0; i < ctors.length; i++) {
-            ctor = ctors[i];
-            if (ctor.getGenericParameterTypes().length == 0)
-                break;
-        }
+        @SuppressWarnings("unchecked")
+        Constructor<T> ctor = (Constructor<T>) Arrays.stream(type.getDeclaredConstructors())
+                .filter(c -> c.getParameterCount() == 0)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No-arguments constructor not found for " + type.getName()));
         try {
             while (resultSet.next()) {
                 ctor.setAccessible(true);
-                T instance = (T)ctor.newInstance();
+                T instance = ctor.newInstance();
                 for (Field field : type.getDeclaredFields()) {
                     String fieldName = field.getName();
                     Object value = resultSet.getObject(fieldName);
@@ -144,8 +140,8 @@ public class AbstractDAO<T> {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String rawTableName   = type.getSimpleName().toLowerCase(); // "order"
-        String table = "`" + rawTableName + "`";                     // "`order`"
+        String rawTableName = type.getSimpleName().toLowerCase();
+        String table = "`" + rawTableName + "`";
         String query = createInsertQuery(table);
 
         try {
@@ -155,7 +151,7 @@ public class AbstractDAO<T> {
             int idx = 1;
             for (Field field : type.getDeclaredFields()) {
                 String name = field.getName();
-                if ("id".equalsIgnoreCase(name)) {
+                if (name.equalsIgnoreCase("id")) {
                     continue;
                 }
                 PropertyDescriptor propertyDescriptor = new PropertyDescriptor(name, type);
@@ -184,7 +180,7 @@ public class AbstractDAO<T> {
         Connection connection   = null;
         PreparedStatement statement  = null;
         String rawTableName   = type.getSimpleName().toLowerCase();
-        String table = "`" + rawTableName + "`";  // back‐tick in case of reserved words
+        String table = "`" + rawTableName + "`";
 
         try {
             PropertyDescriptor pd = new PropertyDescriptor("id", type);

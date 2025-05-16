@@ -27,12 +27,13 @@ public class Controller implements TablePopulator {
     private final ClientBLL clientBLL;
     private final ProductBLL productBLL;
     private final OrderBLL orderBLL;
-    private final BillBLL billBLL = new BillBLL();
+    private final BillBLL billBLL;
 
     public Controller() {
         clientBLL = new ClientBLL();
         productBLL = new ProductBLL();
         orderBLL = new OrderBLL();
+        billBLL = new BillBLL();
     }
 
     private void validateEmail(String email) throws IncorrectEmailException {
@@ -99,6 +100,18 @@ public class Controller implements TablePopulator {
         }
     }
 
+    public List<Client> getAllClients() {
+        return clientBLL.findAllClients();
+    }
+
+    public List<Product> getAllProducts() {
+        return productBLL.findAllProducts();
+    }
+
+    public List<Order> getAllOrders() {
+        return orderBLL.findAllOrders();
+    }
+
     public void handleOpenClientWindow() {
         ClientView clientView = new ClientView("Client Menu", this);
         clientView.setVisible(true);
@@ -158,18 +171,6 @@ public class Controller implements TablePopulator {
                     "Insertion Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    public List<Client> getAllClients() {
-        return clientBLL.findAllClients();
-    }
-
-    public List<Product> getAllProducts() {
-        return productBLL.findAllProducts();
-    }
-
-    public List<Order> getAllOrders() {
-        return orderBLL.findAllOrders();
     }
 
     public void handleDeleteClient(Client selectedClient, Component parentComponent) {
@@ -264,14 +265,12 @@ public class Controller implements TablePopulator {
                                   Component parent) {
         boolean anyUpdated = false;
         try {
-            // 1) Name
             if (newName != null && !newName.trim().isEmpty()) {
                 validateProductName(newName);
                 productBLL.updateProductField(product, "name", newName.trim());
                 anyUpdated = true;
             }
 
-            // 2) Price
             if (newPrice != null && !newPrice.trim().isEmpty()) {
                 validateProductPrice(newPrice);
                 double priceVal = Double.parseDouble(newPrice.trim());
@@ -279,7 +278,6 @@ public class Controller implements TablePopulator {
                 anyUpdated = true;
             }
 
-            // 3) Quantity
             if (newQuantity != null && !newQuantity.trim().isEmpty()) {
                 validateProductQuantity(newQuantity);
                 int qtyVal = Integer.parseInt(newQuantity.trim());
@@ -287,7 +285,6 @@ public class Controller implements TablePopulator {
                 anyUpdated = true;
             }
 
-            // 4) Dacă nu s-a completat nimic
             if (!anyUpdated) {
                 JOptionPane.showMessageDialog(parent,
                         "You must complete at least one field!",
@@ -296,7 +293,6 @@ public class Controller implements TablePopulator {
                 return;
             }
 
-            // 5) Success
             JOptionPane.showMessageDialog(parent,
                     "Product has been updated successfully!",
                     "Success",
@@ -317,8 +313,8 @@ public class Controller implements TablePopulator {
     }
 
     public void handleOpenCreateOrderWindow() {
-        OrderView ov = new OrderView("New Order", this);
-        ov.setVisible(true);
+        OrderView orderView = new OrderView("New Order", this);
+        orderView.setVisible(true);
     }
 
     public void handlePlaceOrder(Client client,
@@ -326,11 +322,9 @@ public class Controller implements TablePopulator {
                                  String qtyStr,
                                  Component parent) {
         try {
-            // validate quantity format & positivity
             validateProductQuantity(qtyStr);
             int qty = Integer.parseInt(qtyStr.trim());
 
-            // under‐stock check
             if (product.getQuantity() < qty) {
                 JOptionPane.showMessageDialog(parent,
                         "Under-stock! Only " + product.getQuantity() + " items available.",
@@ -370,7 +364,6 @@ public class Controller implements TablePopulator {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
-
 
     public <T> void showAllWindow(String title,
                                   Supplier<List<T>> dataSupplier) {
