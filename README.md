@@ -17,6 +17,13 @@ enough products, an under-stock message is displayed. After the order is finaliz
 * MySQL Connector/J – a JDBC (Java Database Connectivity) driver provided by Oracle that allows Java applications to connect to and interact with MySQL databases. It facilitates executing SQL queries, manipulating data, and managing connections between the Java application and the MySQL server
 * JavaDoc - used for generating project documentation
 * Maven - used for dependency management
+<br><br>
+
+## Class diagram
+<div align="center">
+  <img width="850" src="https://github.com/user-attachments/assets/ce088ff2-27b2-4f01-8521-d68e50af0667" />
+</div>
+<br>
 
 
 
