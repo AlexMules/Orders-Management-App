@@ -15,8 +15,8 @@ enough products, an under-stock message is displayed. After the order is finaliz
 * MySQL Workbench – used to create the database and populate initial data
 * IntelliJ IDEA – Java development environment
 * MySQL Connector/J – a JDBC (Java Database Connectivity) driver provided by Oracle that allows Java applications to connect to and interact with MySQL databases. It facilitates executing SQL queries, manipulating data, and managing connections between the Java application and the MySQL server
-* JavaDoc - used for documentation
-* Maven - used for build and dependency management
+* JavaDoc - used for generating project documentation
+* Maven - used for dependency management
 
 
 
