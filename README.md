@@ -22,8 +22,16 @@ enough products, an under-stock message is displayed. After the order is finaliz
 ## Class diagram
 <div align="center">
   <img width="850" src="https://github.com/user-attachments/assets/ce088ff2-27b2-4f01-8521-d68e50af0667" />
-</div>
-<br>
+</div><br>
+
+The **`Client`**, **`Order`**, **`Product`**, and **`Bill`** classes form the data model of the application. The **`Bill`** class is immutable, being defined using  `Java records`. A **`Bill`** object is generated for each order and stored in the **log** table in the database. Bills can only be inserted and read from the **log** table, with no updates allowed.
+
+**`AbstractDAO`** is a generic **Data Access Object (DAO)** base class that provides common **`CRUD`** operations for any domain entity. It uses `reflection` and `introspection` to map fields to table columns, enabling data to be easily displayed in the graphical user interface. `Reflection` techniques are used to implement
+the methods for accesing the database tables (except **log**): create, edit, delete and find object. In addition, the `SQL queries` for accessing the database are generated dynamically through `reflection`, based on the object–table mapping. The **`ClientDAO`**, **`ProductDAO`**, and **`OrderDAO`** classes extend **`AbstractDAO`**, using its methods to manage clients, products, and orders. The **`BillDAO`** class contains all operations related to bills.
+
+The business logic layer consists of **`ClientBLL`**, **`ProductBLL`**, **`OrderBLL`**, and **`BillBLL`**. These classes coordinate operations on their respective entities through the corresponding **DAO** classes. **`ClientBLL`** and **`ProductBLL`** support full CRUD operations, while **`OrderBLL`** and **`BillBLL`** are append-only, allowing only creation and retrieval of records.
+
+
 
 
 
