@@ -1,5 +1,5 @@
 # Orders Management App 📦
-## Description
+## 📓 Description
 The application manages client orders in a warehouse and follows the layered architecture pattern (model, business logic, presentation, data access). A relational 
 database is used to store products, clients, and orders.
 
@@ -31,7 +31,31 @@ the methods for accesing the database tables (except **log**): create, edit, del
 
 The business logic layer consists of **`ClientBLL`**, **`ProductBLL`**, **`OrderBLL`**, and **`BillBLL`**. These classes coordinate operations on their respective entities through the corresponding **DAO** classes. **`ClientBLL`** and **`ProductBLL`** support full CRUD operations, while **`OrderBLL`** and **`BillBLL`** are append-only, allowing only creation and retrieval of records.
 
+**`ConnectionFactory`** is a **singleton** class that manages the database connection. It provides a centralized way to obtain a **`Connection`** to the MySQL database and utility methods to safely close **`Connection`**, **`Statement`**, and **`ResultSet`** objects, ensuring proper resource management and logging any errors encountered.<br><br>
 
+## GUI
+<div align="center">
+   <img width="600" height="400" alt="image" src="https://github.com/user-attachments/assets/fc758b31-c37b-43a7-8f1b-efc79c32879a" />
+  <br><br>
+   <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/afe593c2-7f11-4127-bc93-4a97001b9598" />
+  <br><br>
+   <img width="677" height="377" alt="image" src="https://github.com/user-attachments/assets/78f9da87-adb9-4ee7-ac43-796a930c5900" />
+  <br><br>
+   <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/f37992af-6a0d-4b5f-a2fb-97d834eae187" />
+  <br><br>
+   <img width="677" height="377" alt="image" src="https://github.com/user-attachments/assets/f7063205-f5e2-4a23-96e8-13e97901abe9" />
+  <br><br>
+   <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/a1451608-0d78-47ec-9fd0-433078db624b" />
+  <br><br>
+   <img width="750" height="123" alt="image" src="https://github.com/user-attachments/assets/04aa1086-be4d-4d77-a8ca-5c5f84fcb0eb" />
+  <br><br>
+   <img width="506" height="140" alt="image" src="https://github.com/user-attachments/assets/76f87169-75dc-4378-9dce-1eef049cce6a" />
+   <br><br>
+   <img width="677" height="377" alt="image" src="https://github.com/user-attachments/assets/757a0b59-7411-45a7-97a0-e93e28f496f3" />
+  <br><br>
+   <img width="677" height="377" alt="image" src="https://github.com/user-attachments/assets/d3e3c229-fd12-43c5-89bb-d887e6be3882" />
+
+</div>
 
 
 
